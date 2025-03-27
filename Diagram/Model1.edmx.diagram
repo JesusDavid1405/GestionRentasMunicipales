@@ -10,8 +10,8 @@
 				<EntityTypeShape EntityType="Model1.Permission" Width="1.5" PointX="1.5" PointY="5.625" />
 				<EntityTypeShape EntityType="Model1.Form" Width="1.5" PointX="4.375" PointY="8" />
 				<EntityTypeShape EntityType="Model1.ModuleForm" Width="1.5" PointX="1.5" PointY="8" IsExpanded="true" />
-				<EntityTypeShape EntityType="Model1.Module" Width="1.5" PointX="4.375" PointY="10.25" />
-				<EntityTypeShape EntityType="Model1.Log" Width="1.5" PointX="15.625" PointY="1.375" IsExpanded="true" />
+				<EntityTypeShape EntityType="Model1.Module" Width="1.5" PointX="4.375" PointY="10.375" />
+				<EntityTypeShape EntityType="Model1.Log" Width="1.5" PointX="15.375" PointY="1.25" IsExpanded="true" />
 				<EntityTypeShape EntityType="Model1.Certificate" Width="1.5" PointX="10.375" PointY="1.25" />
 				<AssociationConnector Association="Model1.CertificateUser" />
 				<EntityTypeShape EntityType="Model1.Paremeter" Width="1.5" PointX="13" PointY="7.125" />
