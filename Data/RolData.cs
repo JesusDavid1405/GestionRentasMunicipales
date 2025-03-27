@@ -29,19 +29,32 @@ namespace Data
         /// Obtiene todos los roles almacenados en la base de datos.
         /// </summary>
         /// <returns>Lista de roles</returns>
-        public async Task<IEnumerable<Rol>> GetAllAsync()
+        public async Task<IEnumerable<Rol>> GetAllRolAsyncSql()
         {
-            return await _context.Set<Rol>().ToListAsync();
+            string query = @"
+                SELECT r.Id, r.Name
+                FROM Rol r
+                WHERE r.IsDeleted = 0;
+            ";
+
+            return await _context.QueryAsync<Rol>(query);
         }
 
         /// <summary>
         /// Obtiene un rol especifico por su identificador
         /// </summary>
-        public async Task<Rol?> GetByIdAsync(int id)
+        public async Task<IEnumerable<Rol>> GetByIdRolAsync(int id)
         {
             try
             {
-                return await _context.Set<Rol>().FindAsync(id);
+                string query = @"
+                    SELECT r.Id, r.Name
+                    FROM Rol r
+                    WHERE r.Id = @Id AND r.IsDeleted = 0;
+                ";
+
+                var parameters = new { Id = id };
+                return await _context.QueryAsync<Rol>(query);
             }
             catch (Exception ex)
             {
@@ -55,11 +68,20 @@ namespace Data
         /// <param name="rol"></param>
         /// <returns>el rol creado.</returns>
         /// 
-        public async Task<Rol> CreateAsync(Rol rol)
+        public async Task<IEnumerable<Rol>> CreateAsync(Rol rol)
         {
             try
             {
-                await _context.Set<Rol>().AddAsync(rol);
+                string query = @"
+                    INSERT INTO Rol (Id, Name)
+                    OUTPUT INSERTED.Id
+                    VALUES (@Id, @Name);
+                ";
+                var parameters = new {
+                    rol.Id,
+                    rol.Name
+                };
+                await _context.QueryAsync<Rol>(query);
                 await _context.SaveChangesAsync();
                 return rol;
             }

@@ -1,5 +1,6 @@
 ﻿using Entity.Contexts;
 using Entity.Model;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -51,6 +52,8 @@ namespace Data
                 throw;
             }
         }
+
+        //Metodo con LinQ para obtener los modulos
         public async Task<bool> UpdateAsync(Module module)
         {
             try
@@ -58,6 +61,38 @@ namespace Data
                 _context.Set<Module>().Update(module);
                 await _context.SaveChagesAsync();
                 return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error al actualizar el modulo con sus permisos: {ex.Message}");
+                return false;
+            }
+        }
+
+        //Metodo con Sentencias Sql para obtener los modulos  
+
+        public async Task<bool> UpdateAsyncSql(Module module)
+        {
+            try
+            {
+                var Sql = "UPDATE Users SET " +
+                    "Name = @Name, " +
+                    "Description = @Description, " +
+                    "Code = @Code " +
+                    "WHERE Id = @Id";
+
+                var parameters = new SqlParameter[]
+                {
+                    new SqlParameter("@Name", module.Name),
+                    new SqlParameter("@Description", module.Descripcion),
+                    new SqlParameter("@Code", module.Code),
+                    new SqlParameter("@Id", module.Id)
+                };
+
+                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(Sql, parameters);
+
+                return rowsAffected > 0;
+
             }
             catch (Exception ex)
             {
