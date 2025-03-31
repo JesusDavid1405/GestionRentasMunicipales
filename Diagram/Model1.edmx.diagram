@@ -4,41 +4,49 @@
 	<edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
 		<!-- Diagram content (shape and connector positions) -->
 		<edmx:Diagrams>
-			<Diagram DiagramId="13ebca2c884c42be81e210dc7f583e81" Name="Diagram1" ZoomLevel="88" >
-				<EntityTypeShape EntityType="Model1.Rol" Width="1.5" PointX="15.25" PointY="4.875" />
-				<EntityTypeShape EntityType="Model1.User" Width="1.5" PointX="18.25" PointY="2.75" IsExpanded="true" />
-				<EntityTypeShape EntityType="Model1.Permission" Width="1.5" PointX="12.375" PointY="7.125" />
-				<EntityTypeShape EntityType="Model1.Form" Width="1.5" PointX="15.25" PointY="9.5" />
-				<EntityTypeShape EntityType="Model1.ModuleForm" Width="1.5" PointX="12.375" PointY="9.5" IsExpanded="true" />
-				<EntityTypeShape EntityType="Model1.Module" Width="1.5" PointX="15.25" PointY="11.875" />
+			<Diagram DiagramId="13ebca2c884c42be81e210dc7f583e81" Name="Diagram1" ZoomLevel="66" >
+				<EntityTypeShape EntityType="Model1.Rol" Width="1.5" PointX="15.5" PointY="5" />
+				<EntityTypeShape EntityType="Model1.User" Width="1.5" PointX="18.25" PointY="2.625" IsExpanded="true" />
+				<EntityTypeShape EntityType="Model1.Permission" Width="1.5" PointX="12.625" PointY="7.25" IsExpanded="true" />
+				<EntityTypeShape EntityType="Model1.Form" Width="1.5" PointX="15.5" PointY="9.625" />
+				<EntityTypeShape EntityType="Model1.ModuleForm" Width="1.5" PointX="12.625" PointY="9.625" IsExpanded="true" />
+				<EntityTypeShape EntityType="Model1.Module" Width="1.5" PointX="15.5" PointY="12.25" />
 				<EntityTypeShape EntityType="Model1.Log" Width="1.5" PointX="26.25" PointY="2.75" IsExpanded="true" />
-				<EntityTypeShape EntityType="Model1.Certificate" Width="1.5" PointX="21.25" PointY="2.75" />
+				<EntityTypeShape EntityType="Model1.Certificate" Width="1.5" PointX="21.25" PointY="2.5" />
 				<AssociationConnector Association="Model1.CertificateUser" />
-				<EntityTypeShape EntityType="Model1.Paremeter" Width="1.5" PointX="23.875" PointY="8.625" />
-				<EntityTypeShape EntityType="Model1.RolFormPermission" Width="1.5" PointX="15.25" PointY="7.25" IsExpanded="true" />
+				<EntityTypeShape EntityType="Model1.Paremeter" Width="1.5" PointX="26.25" PointY="6" />
+				<EntityTypeShape EntityType="Model1.RolFormPermission" Width="1.5" PointX="15.5" PointY="7.375" IsExpanded="true" />
 				<AssociationConnector Association="Model1.RolPermissionRol" />
 				<AssociationConnector Association="Model1.RolPermissionPermission" />
 				<AssociationConnector Association="Model1.ModuleFormModule" />
 				<AssociationConnector Association="Model1.FormModuleForm" />
 				<EntityTypeShape EntityType="Model1.Establishment" Width="1.5" PointX="23.875" PointY="5.375" />
-				<EntityTypeShape EntityType="Model1.TypeEstablishment" Width="1.5" PointX="23.875" PointY="2.75" />
+				<EntityTypeShape EntityType="Model1.TypeEstablishment" Width="1.5" PointX="23.875" PointY="2.5" />
 				<EntityTypeShape EntityType="Model1.Debt" Width="1.5" PointX="18.25" PointY="6.875" />
 				<AssociationConnector Association="Model1.DebtUser" />
 				<AssociationConnector Association="Model1.DebtEstablishment" ></AssociationConnector>
-				<EntityTypeShape EntityType="Model1.Rent" Width="1.5" PointX="21.25" PointY="5.375" />
+				<EntityTypeShape EntityType="Model1.Rent" Width="1.5" PointX="21.25" PointY="5.125" />
 				<AssociationConnector Association="Model1.EstablishmentTypeEstablishment" />
-				<EntityTypeShape EntityType="Model1.Payment" Width="1.5" PointX="21.375" PointY="8.25" />
-				<EntityTypeShape EntityType="Model1.DebtBill" Width="1.5" PointX="18.25" PointY="10.375" />
-				<EntityTypeShape EntityType="Model1.Bill" Width="1.5" PointX="21.375" PointY="10.75" />
+				<EntityTypeShape EntityType="Model1.Payment" Width="1.5" PointX="21.25" PointY="13.75" />
+				<EntityTypeShape EntityType="Model1.DebtBill" Width="1.5" PointX="18.25" PointY="10.875" />
+				<EntityTypeShape EntityType="Model1.Bill" Width="1.5" PointX="18.25" PointY="13.25" />
 				<AssociationConnector Association="Model1.DebtBillBill" />
 				<AssociationConnector Association="Model1.DebtBillDebt" />
 				<AssociationConnector Association="Model1.DebtPayment" />
 				<AssociationConnector Association="Model1.UserContract" />
 				<AssociationConnector Association="Model1.RentEstablishment" />
-				<EntityTypeShape EntityType="Model1.RolUser" Width="1.5" PointX="15.25" PointY="2.75" />
+				<EntityTypeShape EntityType="Model1.RolUser" Width="1.5" PointX="15.5" PointY="2.875" />
 				<AssociationConnector Association="Model1.RolUserRol" />
 				<AssociationConnector Association="Model1.RolUserUser" />
 				<AssociationConnector Association="Model1.RolFormPermissionForm" />
+        <EntityTypeShape EntityType="Model1.Statement" Width="1.5" PointX="23.875" PointY="9" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model1.Calculation" Width="1.5" PointX="26.25" PointY="8.75" />
+        <EntityTypeShape EntityType="Model1.StatementDetail" Width="1.5" PointX="21.25" PointY="8.875" IsExpanded="true" />
+        <AssociationConnector Association="Model1.StatementDetailStatement" />
+        <AssociationConnector Association="Model1.StatementDetailPayment" />
+        <AssociationConnector Association="Model1.StatementDetailDebt" />
+        <AssociationConnector Association="Model1.StatementDetailEstablishment" />
+        <AssociationConnector Association="Model1.StatementDetailRent" />
 			</Diagram>
 		</edmx:Diagrams>
 	</edmx:Designer>

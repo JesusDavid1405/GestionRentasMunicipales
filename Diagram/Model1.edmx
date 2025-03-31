@@ -95,6 +95,29 @@
 						<End Role="RolFormPermission" EntitySet="RolFormPermissionSet" />
 						<End Role="Form" EntitySet="Forms" />
 					</AssociationSet>
+          <EntitySet Name="Statements" EntityType="Model1.Statement" />
+          <EntitySet Name="Calculations" EntityType="Model1.Calculation" />
+          <EntitySet Name="StatementDetailSet" EntityType="Model1.StatementDetail" />
+          <AssociationSet Name="StatementDetailStatement" Association="Model1.StatementDetailStatement">
+            <End Role="StatementDetail" EntitySet="StatementDetailSet" />
+            <End Role="Statement" EntitySet="Statements" />
+          </AssociationSet>
+          <AssociationSet Name="StatementDetailPayment" Association="Model1.StatementDetailPayment">
+            <End Role="StatementDetail" EntitySet="StatementDetailSet" />
+            <End Role="Payment" EntitySet="Payments" />
+          </AssociationSet>
+          <AssociationSet Name="StatementDetailDebt" Association="Model1.StatementDetailDebt">
+            <End Role="StatementDetail" EntitySet="StatementDetailSet" />
+            <End Role="Debt" EntitySet="Debts" />
+          </AssociationSet>
+          <AssociationSet Name="StatementDetailEstablishment" Association="Model1.StatementDetailEstablishment">
+            <End Role="StatementDetail" EntitySet="StatementDetailSet" />
+            <End Role="Establishment" EntitySet="Establishments" />
+          </AssociationSet>
+          <AssociationSet Name="StatementDetailRent" Association="Model1.StatementDetailRent">
+            <End Role="StatementDetail" EntitySet="StatementDetailSet" />
+            <End Role="Rent" EntitySet="Contracts" />
+          </AssociationSet>
 				</EntityContainer>
 				<EntityType Name="Rol">
 					<Key>
@@ -104,6 +127,7 @@
 					<Property Name="Name" Type="String" Nullable="false" />
 					<NavigationProperty Name="RolPermission" Relationship="Model1.RolPermissionRol" FromRole="Rol" ToRole="RolPermission" />
 					<NavigationProperty Name="RolUser" Relationship="Model1.RolUserRol" FromRole="Rol" ToRole="RolUser" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
 				</EntityType>
 				<EntityType Name="User">
 					<Key>
@@ -115,12 +139,13 @@
 					<Property Name="Email" Type="String" Nullable="false" />
 					<Property Name="Password" Type="String" Nullable="false" />
 					<Property Name="Identification" Type="Int32" Nullable="false" />
-					<Property Name="Telephone" Type="Int64" Nullable="false" />
-					<Property Name="address" Type="String" Nullable="false" />
+					<Property Name="Phone" Type="Int64" Nullable="false" />
+					<Property Name="Address" Type="String" Nullable="false" />
 					<NavigationProperty Name="Certificate" Relationship="Model1.CertificateUser" FromRole="User" ToRole="Certificate" />
 					<NavigationProperty Name="Debt" Relationship="Model1.DebtUser" FromRole="User" ToRole="Debt" />
 					<NavigationProperty Name="Contract" Relationship="Model1.UserContract" FromRole="User" ToRole="Contract" />
 					<NavigationProperty Name="RolUser" Relationship="Model1.RolUserUser" FromRole="User" ToRole="RolUser" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
 				</EntityType>
 				<EntityType Name="Permission">
 					<Key>
@@ -130,6 +155,7 @@
 					<Property Name="Name" Type="String" Nullable="false" />
 					<Property Name="Description" Type="String" Nullable="false" />
 					<NavigationProperty Name="RolPermission" Relationship="Model1.RolPermissionPermission" FromRole="Permission" ToRole="RolPermission" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
 				</EntityType>
 				<EntityType Name="Form">
 					<Key>
@@ -140,6 +166,7 @@
 					<Property Name="Description" Type="String" Nullable="false" />
 					<NavigationProperty Name="ModuleForm" Relationship="Model1.FormModuleForm" FromRole="Form" ToRole="ModuleForm" />
 					<NavigationProperty Name="RolFormPermission" Relationship="Model1.RolFormPermissionForm" FromRole="Form" ToRole="RolFormPermission" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
 				</EntityType>
 				<EntityType Name="ModuleForm">
 					<Key>
@@ -158,6 +185,7 @@
 					<Property Name="Description" Type="String" Nullable="false" />
 					<Property Name="Code" Type="String" Nullable="false" />
 					<NavigationProperty Name="ModuleForm" Relationship="Model1.ModuleFormModule" FromRole="Module" ToRole="ModuleForm" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
 				</EntityType>
 				<EntityType Name="Log">
 					<Key>
@@ -240,6 +268,8 @@
 					<NavigationProperty Name="Rent" Relationship="Model1.RentEstablishment" FromRole="Establishment" ToRole="Rent" />
 					<Property Name="Name" Type="String" Nullable="false" />
 					<Property Name="Address" Type="String" Nullable="false" />
+          <NavigationProperty Name="StatementDetail" Relationship="Model1.StatementDetailEstablishment" FromRole="Establishment" ToRole="StatementDetail" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
 				</EntityType>
 				<EntityType Name="TypeEstablishment">
 					<Key>
@@ -264,6 +294,8 @@
 					<NavigationProperty Name="EstablishmentId" Relationship="Model1.DebtEstablishment" FromRole="Debt" ToRole="Establishment" />
 					<NavigationProperty Name="DebtBill" Relationship="Model1.DebtBillDebt" FromRole="Debt" ToRole="DebtBill" />
 					<NavigationProperty Name="Payment" Relationship="Model1.DebtPayment" FromRole="Debt" ToRole="Payment" />
+          <NavigationProperty Name="StatementDetail" Relationship="Model1.StatementDetailDebt" FromRole="Debt" ToRole="StatementDetail" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
 				</EntityType>
 				<Association Name="DebtUser">
 					<End Type="Model1.Debt" Role="Debt" Multiplicity="*" />
@@ -292,6 +324,7 @@
 					<NavigationProperty Name="UserId" Relationship="Model1.UserContract" FromRole="Contract" ToRole="User" />
 					<Property Name="State" Type="String" Nullable="false" />
 					<NavigationProperty Name="EstablishmentId" Relationship="Model1.RentEstablishment" FromRole="Rent" ToRole="Establishment" />
+          <NavigationProperty Name="StatementDetail" Relationship="Model1.StatementDetailRent" FromRole="Rent" ToRole="StatementDetail" />
 				</EntityType>
 				<Association Name="EstablishmentTypeEstablishment">
 					<End Type="Model1.Establishment" Role="Establishment" Multiplicity="*" />
@@ -306,6 +339,7 @@
 					<Property Name="AmountPaid" Type="Decimal" Nullable="false" Scale="13" Precision="2" />
 					<Property Name="State" Type="Boolean" Nullable="false" />
 					<NavigationProperty Name="DebtId" Relationship="Model1.DebtPayment" FromRole="Payment" ToRole="Debt" />
+          <NavigationProperty Name="StatementDetail" Relationship="Model1.StatementDetailPayment" FromRole="Payment" ToRole="StatementDetail" />
 				</EntityType>
 				<EntityType Name="DebtBill">
 					<Key>
@@ -323,7 +357,7 @@
 					<Property Name="Barcode" Type="Int64" Nullable="false" />
 					<Property Name="IssueDate" Type="DateTime" Nullable="false" />
 					<Property Name="ExpirationDate" Type="DateTime" Nullable="false" />
-					<Property Name="TotalValue" Type="Decimal" Nullable="false" Scale="13" Precision="2" />
+					<Property Name="Amount" Type="Decimal" Nullable="false" Scale="13" Precision="2" />
 					<Property Name="State" Type="String" Nullable="false" />
 					<NavigationProperty Name="DebtBill" Relationship="Model1.DebtBillBill" FromRole="Bill" ToRole="DebtBill" />
 				</EntityType>
@@ -367,6 +401,70 @@
 					<End Type="Model1.RolFormPermission" Role="RolFormPermission" Multiplicity="*" />
 					<End Type="Model1.Form" Role="Form" Multiplicity="1" />
 				</Association>
+        <EntityType Name="Statement">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Type" Type="String" Nullable="false" />
+          <Property Name="Title" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" />
+          <Property Name="GenerationDate" Type="String" Nullable="false" />
+          <Property Name="PeriodStart" Type="String" Nullable="false" />
+          <Property Name="PeriodEnd" Type="String" Nullable="false" />
+          <Property Name="TotalAmount" Type="String" Nullable="false" />
+          <NavigationProperty Name="StatementDetail" Relationship="Model1.StatementDetailStatement" FromRole="Statement" ToRole="StatementDetail" />
+          <Property Name="IsDeleted" Type="String" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Calculation">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Type" Type="String" Nullable="false" />
+          <Property Name="Formula" Type="String" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" />
+        </EntityType>
+        <EntityType Name="StatementDetail">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Catogory" Type="String" Nullable="false" />
+          <Property Name="ItemName" Type="String" Nullable="false" />
+          <Property Name="Amount" Type="String" Nullable="false" />
+          <Property Name="Period" Type="String" Nullable="false" />
+          <Property Name="PreviousPeriodAmount" Type="String" Nullable="false" />
+          <Property Name="TargetAmount" Type="String" Nullable="false" />
+          <Property Name="Variance" Type="String" Nullable="false" />
+          <Property Name="VariancePercentage" Type="String" Nullable="false" />
+          <Property Name="CreatedAt" Type="String" Nullable="false" />
+          <NavigationProperty Name="StatementId" Relationship="Model1.StatementDetailStatement" FromRole="StatementDetail" ToRole="Statement" />
+          <NavigationProperty Name="PaymentId" Relationship="Model1.StatementDetailPayment" FromRole="StatementDetail" ToRole="Payment" />
+          <NavigationProperty Name="DebtId" Relationship="Model1.StatementDetailDebt" FromRole="StatementDetail" ToRole="Debt" />
+          <NavigationProperty Name="EstablishmentId" Relationship="Model1.StatementDetailEstablishment" FromRole="StatementDetail" ToRole="Establishment" />
+          <NavigationProperty Name="RentId" Relationship="Model1.StatementDetailRent" FromRole="StatementDetail" ToRole="Rent" />
+        </EntityType>
+        <Association Name="StatementDetailStatement">
+          <End Type="Model1.StatementDetail" Role="StatementDetail" Multiplicity="*" />
+          <End Type="Model1.Statement" Role="Statement" Multiplicity="1" />
+        </Association>
+        <Association Name="StatementDetailPayment">
+          <End Type="Model1.StatementDetail" Role="StatementDetail" Multiplicity="*" />
+          <End Type="Model1.Payment" Role="Payment" Multiplicity="1" />
+        </Association>
+        <Association Name="StatementDetailDebt">
+          <End Type="Model1.StatementDetail" Role="StatementDetail" Multiplicity="*" />
+          <End Type="Model1.Debt" Role="Debt" Multiplicity="1" />
+        </Association>
+        <Association Name="StatementDetailEstablishment">
+          <End Type="Model1.StatementDetail" Role="StatementDetail" Multiplicity="*" />
+          <End Type="Model1.Establishment" Role="Establishment" Multiplicity="1" />
+        </Association>
+        <Association Name="StatementDetailRent">
+          <End Type="Model1.StatementDetail" Role="StatementDetail" Multiplicity="*" />
+          <End Type="Model1.Rent" Role="Rent" Multiplicity="1" />
+        </Association>
 			</Schema>
 		</edmx:ConceptualModels>
 		<!-- C-S mapping content -->

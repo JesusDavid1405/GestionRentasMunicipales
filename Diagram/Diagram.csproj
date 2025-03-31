@@ -62,5 +62,8 @@
       <DependentUpon>Model1.edmx</DependentUpon>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="DDL.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
