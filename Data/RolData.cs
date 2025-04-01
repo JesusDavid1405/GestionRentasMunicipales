@@ -101,8 +101,7 @@ namespace Data
         {
             try
             {
-                return await _context.Set<User>()
-                    .Include(r => r.RolUser) // Relación con RolUser
+                return await _context.Set<Rol>()
                     .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted);
             }
             catch(Exception ex)

@@ -127,7 +127,7 @@
 					<Property Name="Name" Type="String" Nullable="false" />
 					<NavigationProperty Name="RolPermission" Relationship="Model1.RolPermissionRol" FromRole="Rol" ToRole="RolPermission" />
 					<NavigationProperty Name="RolUser" Relationship="Model1.RolUserRol" FromRole="Rol" ToRole="RolUser" />
-          <Property Name="IsDeleted" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
 				</EntityType>
 				<EntityType Name="User">
 					<Key>
@@ -145,7 +145,7 @@
 					<NavigationProperty Name="Debt" Relationship="Model1.DebtUser" FromRole="User" ToRole="Debt" />
 					<NavigationProperty Name="Contract" Relationship="Model1.UserContract" FromRole="User" ToRole="Contract" />
 					<NavigationProperty Name="RolUser" Relationship="Model1.RolUserUser" FromRole="User" ToRole="RolUser" />
-          <Property Name="IsDeleted" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
 				</EntityType>
 				<EntityType Name="Permission">
 					<Key>
@@ -155,7 +155,7 @@
 					<Property Name="Name" Type="String" Nullable="false" />
 					<Property Name="Description" Type="String" Nullable="false" />
 					<NavigationProperty Name="RolPermission" Relationship="Model1.RolPermissionPermission" FromRole="Permission" ToRole="RolPermission" />
-          <Property Name="IsDeleted" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
 				</EntityType>
 				<EntityType Name="Form">
 					<Key>
@@ -166,7 +166,7 @@
 					<Property Name="Description" Type="String" Nullable="false" />
 					<NavigationProperty Name="ModuleForm" Relationship="Model1.FormModuleForm" FromRole="Form" ToRole="ModuleForm" />
 					<NavigationProperty Name="RolFormPermission" Relationship="Model1.RolFormPermissionForm" FromRole="Form" ToRole="RolFormPermission" />
-          <Property Name="IsDeleted" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
 				</EntityType>
 				<EntityType Name="ModuleForm">
 					<Key>
@@ -185,7 +185,7 @@
 					<Property Name="Description" Type="String" Nullable="false" />
 					<Property Name="Code" Type="String" Nullable="false" />
 					<NavigationProperty Name="ModuleForm" Relationship="Model1.ModuleFormModule" FromRole="Module" ToRole="ModuleForm" />
-          <Property Name="IsDeleted" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
 				</EntityType>
 				<EntityType Name="Log">
 					<Key>
@@ -195,8 +195,8 @@
 					<Property Name="TableName" Type="String" Nullable="false" />
 					<Property Name="PropietyName" Type="String" Nullable="false" />
 					<Property Name="Action" Type="String" Nullable="false" />
-					<Property Name="TimeStamp" Type="String" Nullable="false" />
-					<Property Name="UserId" Type="String" Nullable="false" />
+					<Property Name="TimeStamp" Type="DateTime" Nullable="false" />
+					<Property Name="UserId" Type="Int32" Nullable="false" />
 					<Property Name="OldValue" Type="String" Nullable="false" />
 					<Property Name="NewValue" Type="String" Nullable="false" />
 				</EntityType>
@@ -220,7 +220,7 @@
 					</Key>
 					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
 					<Property Name="Name" Type="String" Nullable="false" />
-					<Property Name="Value" Type="Decimal" Nullable="false" Scale="13" Precision="2" />
+					<Property Name="Value" Type="Decimal" Nullable="false" Scale="2" Precision="15" />
 					<Property Name="Description" Type="String" Nullable="false" />
 				</EntityType>
 				<EntityType Name="RolFormPermission">
@@ -235,14 +235,6 @@
 				<Association Name="RolPermissionRol">
 					<End Type="Model1.RolFormPermission" Role="RolPermission" Multiplicity="*" />
 					<End Type="Model1.Rol" Role="Rol" Multiplicity="1" />
-					<ReferentialConstraint>
-						<Principal Role="RolPermission">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="Rol">
-							<PropertyRef Name="RolPermissionId" />
-						</Dependent>
-					</ReferentialConstraint>
 				</Association>
 				<Association Name="RolPermissionPermission">
 					<End Type="Model1.RolFormPermission" Role="RolPermission" Multiplicity="*" />
@@ -269,7 +261,7 @@
 					<Property Name="Name" Type="String" Nullable="false" />
 					<Property Name="Address" Type="String" Nullable="false" />
           <NavigationProperty Name="StatementDetail" Relationship="Model1.StatementDetailEstablishment" FromRole="Establishment" ToRole="StatementDetail" />
-          <Property Name="IsDeleted" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
 				</EntityType>
 				<EntityType Name="TypeEstablishment">
 					<Key>
@@ -277,7 +269,7 @@
 					</Key>
 					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
 					<Property Name="Name" Type="String" Nullable="false" />
-					<Property Name="UVT" Type="Decimal" Nullable="false" Scale="13" Precision="2" />
+					<Property Name="UVT" Type="Decimal" Nullable="false" Scale="2" Precision="13" />
 					<Property Name="PaymentTime" Type="String" Nullable="false" />
 					<NavigationProperty Name="Establishment" Relationship="Model1.EstablishmentTypeEstablishment" FromRole="TypeEstablishment" ToRole="Establishment" />
 				</EntityType>
@@ -287,27 +279,19 @@
 					</Key>
 					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
 					<Property Name="DebtDate" Type="DateTime" Nullable="false" />
-					<Property Name="GrossValue" Type="Decimal" Nullable="false" Scale="13" Precision="2" />
-					<Property Name="IvaValue" Type="Decimal" Nullable="false" Scale="13" Precision="2" />
-					<Property Name="DebtTotal" Type="Decimal" Nullable="false" Scale="13" Precision="2" />
+					<Property Name="GrossValue" Type="Decimal" Nullable="false" Scale="2" Precision="13" />
+					<Property Name="IvaValue" Type="Decimal" Nullable="false" Scale="2" Precision="13" />
+					<Property Name="DebtTotal" Type="Decimal" Nullable="false" Scale="2" Precision="13" />
 					<NavigationProperty Name="UserId" Relationship="Model1.DebtUser" FromRole="Debt" ToRole="User" />
 					<NavigationProperty Name="EstablishmentId" Relationship="Model1.DebtEstablishment" FromRole="Debt" ToRole="Establishment" />
 					<NavigationProperty Name="DebtBill" Relationship="Model1.DebtBillDebt" FromRole="Debt" ToRole="DebtBill" />
 					<NavigationProperty Name="Payment" Relationship="Model1.DebtPayment" FromRole="Debt" ToRole="Payment" />
           <NavigationProperty Name="StatementDetail" Relationship="Model1.StatementDetailDebt" FromRole="Debt" ToRole="StatementDetail" />
-          <Property Name="IsDeleted" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
 				</EntityType>
 				<Association Name="DebtUser">
 					<End Type="Model1.Debt" Role="Debt" Multiplicity="*" />
 					<End Type="Model1.User" Role="User" Multiplicity="1" />
-					<ReferentialConstraint>
-						<Principal Role="Debt">
-							<PropertyRef Name="Id" />
-						</Principal>
-						<Dependent Role="User">
-							<PropertyRef Name="DebtId" />
-						</Dependent>
-					</ReferentialConstraint>
 				</Association>
 				<Association Name="DebtEstablishment">
 					<End Type="Model1.Debt" Role="Debt" Multiplicity="*" />
@@ -318,11 +302,11 @@
 						<PropertyRef Name="Id" />
 					</Key>
 					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-					<Property Name="ContractDate" Type="String" Nullable="false" />
-					<Property Name="ExpirationDtae" Type="String" Nullable="false" />
+					<Property Name="ContractDate" Type="DateTime" Nullable="false" />
+					<Property Name="ExpirationDate" Type="DateTime" Nullable="false" />
 					<Property Name="SocialReason" Type="String" Nullable="false" />
 					<NavigationProperty Name="UserId" Relationship="Model1.UserContract" FromRole="Contract" ToRole="User" />
-					<Property Name="State" Type="String" Nullable="false" />
+					<Property Name="State" Type="Boolean" Nullable="false" />
 					<NavigationProperty Name="EstablishmentId" Relationship="Model1.RentEstablishment" FromRole="Rent" ToRole="Establishment" />
           <NavigationProperty Name="StatementDetail" Relationship="Model1.StatementDetailRent" FromRole="Rent" ToRole="StatementDetail" />
 				</EntityType>
@@ -336,7 +320,7 @@
 					</Key>
 					<Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
 					<Property Name="PaymentDate" Type="DateTime" Nullable="false" />
-					<Property Name="AmountPaid" Type="Decimal" Nullable="false" Scale="13" Precision="2" />
+					<Property Name="AmountPaid" Type="Decimal" Nullable="false" Scale="2" Precision="13" />
 					<Property Name="State" Type="Boolean" Nullable="false" />
 					<NavigationProperty Name="DebtId" Relationship="Model1.DebtPayment" FromRole="Payment" ToRole="Debt" />
           <NavigationProperty Name="StatementDetail" Relationship="Model1.StatementDetailPayment" FromRole="Payment" ToRole="StatementDetail" />
@@ -357,8 +341,8 @@
 					<Property Name="Barcode" Type="Int64" Nullable="false" />
 					<Property Name="IssueDate" Type="DateTime" Nullable="false" />
 					<Property Name="ExpirationDate" Type="DateTime" Nullable="false" />
-					<Property Name="Amount" Type="Decimal" Nullable="false" Scale="13" Precision="2" />
-					<Property Name="State" Type="String" Nullable="false" />
+					<Property Name="Amount" Type="Decimal" Nullable="false" Scale="2" Precision="13" />
+					<Property Name="State" Type="Boolean" Nullable="false" />
 					<NavigationProperty Name="DebtBill" Relationship="Model1.DebtBillBill" FromRole="Bill" ToRole="DebtBill" />
 				</EntityType>
 				<Association Name="DebtBillBill">
@@ -409,12 +393,12 @@
           <Property Name="Type" Type="String" Nullable="false" />
           <Property Name="Title" Type="String" Nullable="false" />
           <Property Name="Description" Type="String" Nullable="false" />
-          <Property Name="GenerationDate" Type="String" Nullable="false" />
-          <Property Name="PeriodStart" Type="String" Nullable="false" />
-          <Property Name="PeriodEnd" Type="String" Nullable="false" />
-          <Property Name="TotalAmount" Type="String" Nullable="false" />
+          <Property Name="GenerationDate" Type="DateTime" Nullable="false" />
+          <Property Name="PeriodStart" Type="DateTime" Nullable="false" />
+          <Property Name="PeriodEnd" Type="DateTime" Nullable="false" />
+          <Property Name="TotalAmount" Type="Decimal" Nullable="false" Scale="2" Precision="13" />
           <NavigationProperty Name="StatementDetail" Relationship="Model1.StatementDetailStatement" FromRole="Statement" ToRole="StatementDetail" />
-          <Property Name="IsDeleted" Type="String" Nullable="false" />
+          <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="Calculation">
           <Key>
@@ -432,13 +416,13 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Catogory" Type="String" Nullable="false" />
           <Property Name="ItemName" Type="String" Nullable="false" />
-          <Property Name="Amount" Type="String" Nullable="false" />
+          <Property Name="Amount" Type="Decimal" Nullable="false" Scale="2" Precision="13" />
           <Property Name="Period" Type="String" Nullable="false" />
           <Property Name="PreviousPeriodAmount" Type="String" Nullable="false" />
-          <Property Name="TargetAmount" Type="String" Nullable="false" />
-          <Property Name="Variance" Type="String" Nullable="false" />
-          <Property Name="VariancePercentage" Type="String" Nullable="false" />
-          <Property Name="CreatedAt" Type="String" Nullable="false" />
+          <Property Name="TargetAmount" Type="Decimal" Nullable="false" Scale="2" Precision="13" />
+          <Property Name="Variance" Type="Decimal" Nullable="false" Scale="2" Precision="13" />
+          <Property Name="VariancePercentage" Type="Decimal" Nullable="false" Scale="2" Precision="13" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" />
           <NavigationProperty Name="StatementId" Relationship="Model1.StatementDetailStatement" FromRole="StatementDetail" ToRole="Statement" />
           <NavigationProperty Name="PaymentId" Relationship="Model1.StatementDetailPayment" FromRole="StatementDetail" ToRole="Payment" />
           <NavigationProperty Name="DebtId" Relationship="Model1.StatementDetailDebt" FromRole="StatementDetail" ToRole="Debt" />
