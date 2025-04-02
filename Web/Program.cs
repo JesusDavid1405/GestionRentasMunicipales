@@ -8,7 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("name=DefaultConnection")));
+    options.UseSqlServer("name=DefaultConnection")
+);
 
 
 builder.Services.AddControllers();
@@ -19,6 +20,8 @@ builder.Services.AddSwaggerGen();
 /// Definicion de Servicios 
 builder.Services.AddScoped<RolBusiness>();
 builder.Services.AddScoped<RolData>();
+
+var OrigenesPermitidos = builder.Configuration.GetValue<String>("OrigenesPermitidos")!.Split(",");
 
 var app = builder.Build();
 

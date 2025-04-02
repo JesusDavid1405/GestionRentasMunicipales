@@ -71,7 +71,7 @@ namespace Business
             {
                 ValidateRol(rolDto);
 
-                var rol= MapToEntity(rolDto);
+                var rol = MapToEntity(rolDto);
 
                 var rolCreado = await _rolData.CreateRolAsyncSql(rol);
 
@@ -91,12 +91,11 @@ namespace Business
                 ValidateRol(rolDto);
 
                 var existingRol = await _rolData.GetByIdRolAsyncSql(rolDto.RolId);
-                if (existingRol != null) 
+                if (existingRol == null)
                 {
                     throw new EntityNotFoundException("Rol", rolDto.RolId);
                 }
 
-                existingRol.Id = rolDto.RolId;
                 existingRol.Name = rolDto.RolName;
                 existingRol.Active = rolDto.State;
 
@@ -108,8 +107,27 @@ namespace Business
                 _logger.LogError(ex, "Error al actualizar el rol con ID: {UserId}", rolDto.RolName);
                 throw new ExternalServiceException("Base de datos", "Error al actualizar el Rol", ex);
             }
-        }       
-            
+        }
+
+        /// <summary>
+        /// Elimina un rol de la base de datos.
+        /// </summary>
+        /// <param name="RolDto"></param>
+        /// <exception cref="Utilities.Exceptions.ValidationException"></exception>
+
+        //public async Task<bool> DeletePersistentAsyncRolSql(int id)
+        //{
+        //    try
+        //    {
+        //        if()
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error al eliminar el rol con ID: {RolId}", id);
+        //        throw new ExternalServiceException("Base de datos", "Error al eliminar el rol", ex);
+        //    }
+        //}
+
         // Método para validar el DTO
         private void ValidateRol(RolDto RolDto)
         {
@@ -132,6 +150,7 @@ namespace Business
             {
                 RolId = rol.Id,
                 RolName = rol.Name,
+                State = rol.Active,
             };
         }
 
@@ -142,6 +161,7 @@ namespace Business
             {
                 Id = rolDTO.RolId,
                 Name = rolDTO.RolName,
+                Active= rolDTO.State,
             };
         }
 

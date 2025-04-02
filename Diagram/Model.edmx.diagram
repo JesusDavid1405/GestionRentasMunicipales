@@ -4,10 +4,10 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="9ef95dda619644889b8434479cb5f5ea" Name="Diagram1" ZoomLevel="16" >
+      <Diagram DiagramId="9ef95dda619644889b8434479cb5f5ea" Name="Diagram1" ZoomLevel="48" >
         <EntityTypeShape EntityType="Model.Rol" Width="1.5" PointX="4.625" PointY="1.25" />
         <EntityTypeShape EntityType="Model.User" Width="1.5" PointX="7.5" PointY="6.875" />
-        <EntityTypeShape EntityType="Model.Permission" Width="1.5" PointX="5" PointY="21.5" />
+        <EntityTypeShape EntityType="Model.Permission" Width="1.5" PointX="0.5" PointY="16.5" />
         <EntityTypeShape EntityType="Model.Form" Width="1.5" PointX="12" PointY="4.125" />
         <EntityTypeShape EntityType="Model.ModuleForm" Width="1.5" PointX="9.75" PointY="5.125" />
         <EntityTypeShape EntityType="Model.Module" Width="1.5" PointX="12" PointY="7.75" />

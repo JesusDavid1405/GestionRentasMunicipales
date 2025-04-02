@@ -1,6 +1,7 @@
 ﻿using Business;
 using Entity.DTOs;
 using Entity.Model;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -110,6 +111,71 @@ namespace Web.Controllers
             catch (ExternalServiceException ex)
             {
                 _logger.LogError(ex, "Error al crear el permiso");
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        ///<summary>
+        /// editar un permiso en el sistema
+        /// </summary>
+
+        [HttpPut]
+        [ProducesResponseType(typeof(RolDto), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> UpdateRolAsync(int id, [FromBody] RolDto rolDto)
+        {
+            try
+            {
+                if (id != rolDto.RolId)
+                {
+                    return BadRequest(new { message = "El ID de la URL no concide con el ID del Rol" });
+                }
+
+                var updateRol = await _rolBusiness.UpdateRolAsync(rolDto);
+                return Ok(updateRol);
+            }
+            catch (ValidationException ex)
+            {
+                _logger.LogWarning(ex, "Validacion fallida al actualizar Rol con ID: {RolId}", id);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (EntityNotFoundException ex)
+            {
+                _logger.LogInformation(ex, "Permiso no encontrado con ID: {RolId}", id);
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ExternalServiceException ex)
+            {
+                _logger.LogError(ex, "Error al actualizar Rol con ID: {RolId}", id);
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete]
+        [ProducesResponseType(typeof(RolDto), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> DeleteRolAsync(int id)
+        {
+            try
+            {
+                var deleteRol = await _rolBusiness.DeleteRolAsync(id);
+                return Ok(deleteRol);
+            }
+            catch (ValidationException ex)
+            {
+                _logger.LogWarning(ex, "Validacion fallida al eliminar Rol con ID: {RolId}", id);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (EntityNotFoundException ex)
+            {
+                _logger.LogInformation(ex, "Permiso no encontrado con ID: {RolId}", id);
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ExternalServiceException ex)
+            {
+                _logger.LogError(ex, "Error al eliminar Rol con ID: {RolId}", id);
                 return StatusCode(500, new { message = ex.Message });
             }
         }

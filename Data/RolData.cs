@@ -45,7 +45,7 @@ namespace Data
                 WHERE r.Active = 1;
             ";
 
-            return (IEnumerable<Rol>)await _context.QueryAsync<IEnumerable<Rol>>(query);
+            return (IEnumerable<Rol>)await _context.QueryAsync<Rol>(query);
         }
 
         ///<summary>
@@ -127,8 +127,8 @@ namespace Data
 
                 var parameters = new 
                 {
-                    RolName = rol.Name,
-                    State = rol.Active
+                    Name = rol.Name,
+                    Active = rol.Active
                 };
 
                 rol.Id = await _context.ExecuteScalarAsync<int>(query, parameters);
@@ -150,14 +150,17 @@ namespace Data
             {
                 string query = @"
                     UPDATE [Rol]
-                    SET Name = @Name
+                    SET 
+                    Name = @Name,
+                    Active = @Active
                     WHERE Id = @Id;
                 ";
 
                 var parameters = new
                 {
-                    rol.Id,
-                    rol.Name
+                    Id = rol.Id,
+                    Name = rol.Name,
+                    Active = rol.Active
                 };
 
                 int rowsAffected = await _context.ExecuteAsync(query, parameters);
@@ -201,7 +204,7 @@ namespace Data
         {
             try
             {
-                string query = "DELETE FROM Users WHERE Id = @Id;";
+                string query = "DELETE FROM Rol WHERE Id = @Id;";
 
                 var parameters = new { Id = id };
 
