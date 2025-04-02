@@ -10,7 +10,7 @@ namespace Entity.Model
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public Boolean IsDeleted { get; set; }
+        public bool Active { get; set; }
 
         public List<RolUser> RolUser { get; set; } = new List<RolUser>();
         public List<RolFormPermission> RolFormPermission { get; set; } = new List<RolFormPermission>();

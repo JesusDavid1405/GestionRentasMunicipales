@@ -10,7 +10,7 @@ namespace Entity.DTOs
     {
         public int RolId { get; set; }
         public string RolName { get; set; }
-        public string UserId { get; set; }
+        public bool State { get; set; }
 
     }
 }

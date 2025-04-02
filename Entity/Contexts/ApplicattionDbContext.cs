@@ -169,5 +169,34 @@ namespace Entity.Contexts
             {
             }
         }
+
+        // Métodos de Dapper - Ejemplo: ExecuteScalarAsync
+        public async Task<T> ExecuteScalarAsync<T>(string query, object parameters = null)
+        {
+            using (var connection = this.Database.GetDbConnection())
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    await connection.OpenAsync();
+                }
+
+                return await connection.ExecuteScalarAsync<T>(query, parameters);
+            }
+        }
+
+        // Método para ejecutar comandos Dapper como ExecuteAsync
+        public async Task<int> ExecuteAsync(string query, object parameters = null)
+        {
+            using (var connection = this.Database.GetDbConnection())
+            {
+                if (connection.State == ConnectionState.Closed)
+                {
+                    await connection.OpenAsync();
+                }
+
+                // Ejecuta el comando usando Dapper
+                return await connection.ExecuteAsync(query, parameters);
+            }
+        }
     }
 }

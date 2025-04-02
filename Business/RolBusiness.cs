@@ -14,9 +14,9 @@ namespace Business
     public class RolBusiness
     {
         private readonly RolData _rolData;
-        private readonly ILogger _logger;
+        private readonly ILogger<RolBusiness> _logger;
 
-        public RolBusiness(RolData rolData, ILogger logger)
+        public RolBusiness(RolData rolData, ILogger<RolBusiness> logger)
         {
             _rolData = rolData;
             _logger = logger;
@@ -37,11 +37,6 @@ namespace Business
             }
         }
 
-        private IEnumerable<RolDto> MapToDTOList(IEnumerable<RolDto> roles)
-        {
-            throw new NotImplementedException();
-        }
-
         // Método para obtener un rol por ID como DTO
         public async Task<RolDto> GetRolByIdAsync(int id)
         {
@@ -60,7 +55,7 @@ namespace Business
                     throw new EntityNotFoundException("Rol", id);
                 }
 
-                return MapToDTO((Rol)rol);
+                return MapToDTO(rol);
             }
             catch (Exception ex)
             {
@@ -70,33 +65,51 @@ namespace Business
         }
 
         // Método para crear un rol desde un DTO
-        public async Task<RolDto> CreateRolAsyncSql(RolDto RolDto)
+        public async Task<RolDto> CreateRolAsync(RolDto rolDto)
         {
             try
             {
-                ValidateRol(RolDto);
+                ValidateRol(rolDto);
 
-                var rol = new Rol
-                {
-                    Name = RolDto.RolName,
-
-                };
+                var rol= MapToEntity(rolDto);
 
                 var rolCreado = await _rolData.CreateRolAsyncSql(rol);
 
-                return new RolDto
-                {
-                    RolId = rolCreado.Id,
-                    RolName = rolCreado.Name,
-                };
+                return MapToDTO(rolCreado);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al crear nuevo rol: {RolNombre}", RolDto?.RolName ?? "null");
+                _logger.LogError(ex, "Error al crear nuevo rol: {RolNombre}", rolDto?.RolName ?? "null");
                 throw new ExternalServiceException("Base de datos", "Error al crear el rol", ex);
             }
         }
 
+        public async Task<bool> UpdateRolAsync(RolDto rolDto)
+        {
+            try
+            {
+                ValidateRol(rolDto);
+
+                var existingRol = await _rolData.GetByIdRolAsyncSql(rolDto.RolId);
+                if (existingRol != null) 
+                {
+                    throw new EntityNotFoundException("Rol", rolDto.RolId);
+                }
+
+                existingRol.Id = rolDto.RolId;
+                existingRol.Name = rolDto.RolName;
+                existingRol.Active = rolDto.State;
+
+                return await _rolData.UpdateRolAsyncSql(existingRol);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al actualizar el rol con ID: {UserId}", rolDto.RolName);
+                throw new ExternalServiceException("Base de datos", "Error al actualizar el Rol", ex);
+            }
+        }       
+            
         // Método para validar el DTO
         private void ValidateRol(RolDto RolDto)
         {

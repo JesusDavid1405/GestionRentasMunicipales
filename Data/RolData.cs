@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Entity.Contexts;
-using Entity.DTOs;
 using Entity.Model;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -21,14 +20,14 @@ namespace Data
     public class RolData
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger _logger;
+        private readonly ILogger<RolData> _logger;
 
         /// <summary>
         /// Constructor que recibe recibe el contexto de base de datos.
         /// </summary>
         /// <param name="context">Intancia de <see cref="ApplicationDbContext"/> para la conexión con la base de datos.</param>
 
-        public RolData(ApplicationDbContext context, ILogger logger)
+        public RolData(ApplicationDbContext context, ILogger<RolData> logger)
         {
             _context = context;
             _logger = logger;
@@ -38,15 +37,15 @@ namespace Data
         /// Obtiene todos los roles almacenados en la base de datos.
         /// </summary>
         /// <returns>Lista de roles</returns>
-        public async Task<IEnumerable<RolDto>> GetAllRolAsyncSql()
+        public async Task<IEnumerable<Rol>> GetAllRolAsyncSql()
         {
             string query = @"
-                SELECT r.Id, r.Name
+                SELECT r.Id, r.Name, r.Active
                 FROM Rol r
-                WHERE r.IsDeleted = 0;
+                WHERE r.Active = 1;
             ";
 
-            return await _context.QueryAsync<RolDto>(query);
+            return (IEnumerable<Rol>)await _context.QueryAsync<IEnumerable<Rol>>(query);
         }
 
         ///<summary>
@@ -57,7 +56,7 @@ namespace Data
             try
             {
                 return await _context.Set<Rol>()
-                    .Where(r => !r.IsDeleted)
+                    .Where(r => !r.Active)
                     .Include(r => r.RolUser)
                     .ToListAsync();
                        
@@ -73,18 +72,19 @@ namespace Data
         /// Obtiene un rol especifico por su identificador en SQL
         /// </summary>
         /// 
-        public async Task<IEnumerable<RolDto?>> GetByIdRolAsyncSql(int id)
+        public async Task<Rol?> GetByIdRolAsyncSql(int id)
         {
             try
             {
                 string query = @"
-                    SELECT r.Id, r.Name
+                    SELECT r.Id, r.Name, r.Active
                     FROM Rol r
-                    WHERE r.Id = @Id AND r.IsDeleted = 0;
+                    WHERE r.Id = @Id AND r.Active = 1;
                 ";
 
                 var parameters = new { Id = id };
-                return await _context.QueryAsync<RolDto>(query);
+
+                return await _context.QueryFirstOrDefaultAsync<Rol>(query, parameters);
             }
             catch (Exception ex)
             {
@@ -102,7 +102,7 @@ namespace Data
             try
             {
                 return await _context.Set<Rol>()
-                    .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted);
+                    .FirstOrDefaultAsync(r => r.Id == id && !r.Active);
             }
             catch(Exception ex)
             {
@@ -120,14 +120,15 @@ namespace Data
             try
             {
                 string query = @"
-                    INSERT INTO Rol (Name)
+                    INSERT INTO Rol (Name, Active)
                     OUTPUT INSERTED.Id
-                    VALUES (@Name);
+                    VALUES (@Name, @Active);
                 ";
 
                 var parameters = new 
                 {
-                    rol.Name
+                    RolName = rol.Name,
+                    State = rol.Active
                 };
 
                 rol.Id = await _context.ExecuteScalarAsync<int>(query, parameters);
@@ -178,7 +179,7 @@ namespace Data
         {
             try
             {
-                string query = "UPDATE Rol SET IsDeleted = 1 WHERE Id = @Id;";
+                string query = "UPDATE Rol SET Active = 1 WHERE Id = @Id;";
 
                 var parameters = new { Id = id };
 
