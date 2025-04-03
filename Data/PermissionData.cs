@@ -20,6 +20,7 @@ namespace Data
             _context = context;
             _logger = logger;
         }
+
         /// <summary>
         /// Obtiene todos los Permission almacenados en la base de datos.
         /// </summary>
@@ -73,14 +74,13 @@ namespace Data
                 string query = @"
                     INSERT INTO Permission (Name,Description,IsDeleted)
                     OUTPUT INSERTED.Id
-                    VALUES (@Name, @Description, @IsDelete);
+                    VALUES (@Name, @Description, 0);
                 ";
 
                 var parameters = new
                 {
                     Name = permission.Name,
                     Description = permission.Description,
-                    IsDeleted = permission.IsDeleted,
                 };
 
                 permission.Id = await _context.ExecuteScalarAsync<int>(query, parameters);
@@ -101,8 +101,7 @@ namespace Data
                     UPDATE [Permission]
                     SET 
                     Name = @Name, 
-                    Description = @Description, 
-                    IsDeleted = @IsDeleted
+                    Description = @Description
                     WHERE Id = @Id;
                 ";
                 
@@ -111,7 +110,6 @@ namespace Data
                     Id = permission.Id,
                     Name = permission.Name,
                     Description = permission.Description,
-                    IsDeleted = permission.IsDeleted
                 };
 
                 int rowsAffected = await _context.ExecuteAsync(query, parameters);
@@ -136,7 +134,7 @@ namespace Data
                 string query = @"
                     DELETE FROM Permission
                     WHERE Id = @Id;
-|               ";
+                ";
                 var parameters = new { Id = id };
 
                 await _context.ExecuteAsync(query, parameters);

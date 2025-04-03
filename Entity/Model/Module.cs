@@ -10,8 +10,9 @@ namespace Entity.Model
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Descripcion { get; set; }
+        public string Description { get; set; }
         public int Code { get; set; }
+        public bool IsDeleted { get; set; }
 
         //Dependencia para la tabla pivote ModuleForm
         public List<ModuleForm> ModuleForm { get; set; } = new List<ModuleForm>();

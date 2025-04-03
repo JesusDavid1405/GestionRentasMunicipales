@@ -14,23 +14,51 @@ namespace Data
     public class ModuleData
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger _logger;
+        private readonly ILogger<ModuleData> _logger;
 
-        public ModuleData(ApplicationDbContext context, ILogger logger)
+        //contructor para inyectar el contexto de la base de datos y el logger
+        public ModuleData(ApplicationDbContext context, ILogger<ModuleData> logger)
         {
             _context = context;
             _logger = logger;
         }
 
-        public async Task<IEnumerable<Module>> GetAllAsync()
+        /// <summary>
+        /// Obtiene todos los modulos almacenados en la base de datos.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<Module>> GetAllModuleAsync()
         {
-            return await _context.Set<Module>().ToListAsync();
+            string query = @"
+                SELECT m.Id, m.Name, m.Description, m.Code
+                FROM Module m
+                WHERE m.IsDeleted = 0;
+            ";  
+
+            return (IEnumerable<Module>) await _context.QueryAsync<Module>(query);
         }
-        public async Task<Module?> GetByIdAsync(int id)
+
+        /// <summary>
+        /// Obtiene un modulo por su ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<Module?> GetByIdModuleAsync(int id)
         {
             try
             {
-                return await _context.Set<Module>().FindAsync(id);
+                string query = @"
+                    SELECT m.Id, m.Name, m.Description, m.Code
+                    FROM Module m
+                    WHERE m.IsDeleted = 0 AND m.Id = @Id;
+                ";
+
+                var parameters = new
+                {
+                    Id = id
+                };
+
+                return await _context.QueryFirstOrDefaultAsync<Module>(query, parameters);
             }
             catch (Exception ex)
             {
@@ -38,12 +66,30 @@ namespace Data
                 throw;
             }
         }
-        public async Task<Module> CreateAsync(Module module)
+
+        /// <summary>
+        /// Crea un nuevo modulo en la base de datos.
+        /// </summary>
+        /// <param name="module"></param>
+        /// <returns></returns>
+        public async Task<Module> CreateModuleAsync(Module module)
         {
             try
             {
-                await _context.Set<Module>().AddAsync(module);
-                await _context.SaveChangesAsync();
+                string query = @"
+                    INSERT INTO Module (Name, Description, Code, IsDeleted)
+                    OUTPUT INSERTED.Id
+                    VALUES (@Name, @Description, @Code, 0);
+                ";
+
+                var parameters = new
+                {
+                    Name = module.Name,
+                    Description = module.Description,
+                    Code = module.Code,
+                };
+
+                module.Id = await _context.ExecuteScalarAsync<int>(query, parameters);
                 return module;
             }
             catch (Exception ex)
@@ -54,67 +100,81 @@ namespace Data
         }
 
         //Metodo con LinQ para obtener los modulos
-        public async Task<bool> UpdateAsync(Module module)
+        public async Task<bool> UpdateModuleAsync(Module module)
         {
             try
             {
-                _context.Set<Module>().Update(module);
-                await _context.SaveChagesAsync();
+                string query = @"
+                    UPDATE Module
+                    SET 
+                    Name = @Name, 
+                    Description = @Description, 
+                    Code = @Code
+                    WHERE Id = @Id;
+                ";
+
+                var parameters = new
+                {
+                    Name = module.Name,
+                    Description = module.Description,
+                    Code = module.Code,
+                    Id = module.Id
+                };
+
+                int rowsAffected = await _context.ExecuteAsync(query, parameters);
+                return rowsAffected > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error al actualizar el modulo con sus permisos: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<bool> DeletePersistentModuleAsync(int id)
+        {
+            try
+            {
+                string query = @"
+                    DELETE FROM Module
+                    WHERE Id = @Id;
+                ";
+
+                var parameters = new
+                {
+                    Id = id
+                };
+
+                await _context.ExecuteAsync(query, parameters);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error al actualizar el modulo con sus permisos: {ex.Message}");
+                _logger.LogError($"Error al eliminar el modulo{ex.Message}");
                 return false;
             }
         }
 
-        //Metodo con Sentencias Sql para obtener los modulos  
-
-        public async Task<bool> UpdateAsyncSql(Module module)
+        public async Task<bool> DeleteLogicalModuleAsync(int id)
         {
             try
             {
-                var Sql = "UPDATE Users SET " +
-                    "Name = @Name, " +
-                    "Description = @Description, " +
-                    "Code = @Code " +
-                    "WHERE Id = @Id";
-
-                var parameters = new SqlParameter[]
+                string query = @"
+                    UPDATE Module
+                    SET IsDeleted = 1
+                    WHERE Id = @Id;
+                ";
+                var parameters = new
                 {
-                    new SqlParameter("@Name", module.Name),
-                    new SqlParameter("@Description", module.Descripcion),
-                    new SqlParameter("@Code", module.Code),
-                    new SqlParameter("@Id", module.Id)
+                    Id = id
                 };
 
-                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(Sql, parameters);
-
-                return rowsAffected > 0;
-
+                await _context.ExecuteAsync(query, parameters);
+                return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error al actualizar el modulo con sus permisos: {ex.Message}");
-                return false;
-            }
-        }
-        public async Task<bool> DeleteAsync(int id)
-        {
-            try
-            {
-                var module = await _context.Set<Module>().FindAsync(id);
-                if (module == null)
-                    return false;
-
-                _context.Set<Module>().Remove(module);
-                await _context.SaveChangesAsync();
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error al eliminar el modulo{ex.Message}");
+                _logger.LogError($"Error al eliminar el modulo: {id}", ex);
                 return false;
             }
         }

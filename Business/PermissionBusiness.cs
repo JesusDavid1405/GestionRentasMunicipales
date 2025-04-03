@@ -11,7 +11,7 @@ using Utilities.Exceptions;
 
 namespace Business
 {
-    class PermissionBusiness
+    public class PermissionBusiness
     {
         private readonly PermissionData _permissionData;
         private readonly ILogger<PermissionBusiness> _logger;
@@ -22,7 +22,11 @@ namespace Business
             _logger = logger;
         }
 
-        // Método para obtener todos los roles como DTOs
+        /// <summary>
+        /// Método para obtener todos los permisos como DTOs
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ExternalServiceException"></exception>
         public async Task<IEnumerable<PermissionDto>> GetAllPermissionAsync()
         {
             try
@@ -37,7 +41,13 @@ namespace Business
             }
         }
 
-        // Método para obtener un rol por ID como DTO
+        /// <summary>
+        /// Método para obtener un permiso por ID como DTO
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="Utilities.Exceptions.ValidationException"></exception>
+        /// <exception cref="ExternalServiceException"></exception>
         public async Task<PermissionDto> GetPermissionByIdAsync(int id)
         {
             if (id <= 0)
@@ -64,27 +74,23 @@ namespace Business
             }
         }
 
-        // Método para crear un formulario desde un DTO
+        /// <summary>
+        /// Método para crear un nuevo Permission
+        /// </summary>
+        /// <param name="PermissionDto"></param>
+        /// <returns></returns>
+        /// <exception cref="ExternalServiceException"></exception>
         public async Task<PermissionDto> CreatePermissionAsync(PermissionDto PermissionDto)
         {
             try
             {
                 ValidatePermission(PermissionDto);
 
-                var permission = new Permission
-                {
-                    Name = PermissionDto.PermissionName,
-                    Description = PermissionDto.PermissionDescription // Se agregó la descripción
-                };
+                var permission = MapToEntity(PermissionDto);
 
                 var permissionCreado = await _permissionData.CreatePermissionAsync(permission);
 
-                return new PermissionDto
-                {
-                    PermissionId = permission.Id,
-                    PermissionName = permission.Name,
-                    PermissionDescription = permission.Description // Se agregó la descripción
-                };
+                return MapToDTO(permissionCreado);
             }
             catch (Exception ex)
             {
@@ -92,6 +98,101 @@ namespace Business
                 throw new ExternalServiceException("Base de datos", "Error al crear el permiso", ex);
             }
         }
+
+        /// <summary>
+        /// Metodo para actualizar un Permission
+        /// </summary>
+        /// <param name="PermissionDto"></param>
+        /// <returns></returns>
+        /// <exception cref="ExternalServiceException"></exception>
+
+        public async Task<bool> UpdatePermissionAsync(PermissionDto PermissionDto)
+        {
+            try
+            {
+                ValidatePermission(PermissionDto);   
+                
+                var existigPermission = await _permissionData.GetByIdPermissionAsync(PermissionDto.PermissionId);
+                if (existigPermission == null)
+                {
+                    throw new EntityNotFoundException("Permiso", PermissionDto.PermissionId);
+                } 
+
+                existigPermission.Name = PermissionDto.PermissionName;
+                existigPermission.Description = PermissionDto.PermissionDescription;
+                existigPermission.IsDeleted = PermissionDto.Hidden;
+
+                return await _permissionData.UpdatePermissionAsync(existigPermission);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al actualizar el permiso: {PermissionName}", PermissionDto?.PermissionName ?? "null");
+                throw new ExternalServiceException("Base de datos", "Error al actualizar el permiso", ex);
+            }
+        }
+
+        /// <summary>
+        /// Método para eliminar un permiso de forma persistente
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="ExternalServiceException"></exception>
+
+        public async Task<bool> DeletePersistentPernissionAsync(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    _logger.LogWarning("Se intentó eliminar un permiso con ID inválido: {PermissionId}", id);
+                    throw new Utilities.Exceptions.ValidationException("id", "El ID del permiso debe ser mayor que cero");
+                }
+                var permission = await _permissionData.GetByIdPermissionAsync(id);
+                if (permission == null)
+                {
+                    _logger.LogInformation("No se encontró ningún permiso con ID: {PermissionId}", id);
+                    throw new EntityNotFoundException("Permiso", id);
+                }
+                return await _permissionData.DeletePersistenteAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar el permiso con ID: {PermissionId}", id);
+                throw new ExternalServiceException("Base de datos", $"Error al eliminar el permiso con ID {id}", ex);
+            }
+        }
+
+
+        /// <summary>
+        /// Método para eliminar un permiso de forma lógica
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="ExternalServiceException"></exception>
+        public async Task<bool> DeleteLogicalPermissionAsync(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    _logger.LogWarning("Se intentó eliminar un permiso con ID inválido: {PermissionId}", id);
+                    throw new Utilities.Exceptions.ValidationException("id", "El ID del permiso debe ser mayor que cero");
+                }
+                var permission = await _permissionData.GetByIdPermissionAsync(id);
+                if (permission == null)
+                {
+                    _logger.LogInformation("No se encontró ningún permiso con ID: {PermissionId}", id);
+                    throw new EntityNotFoundException("Permiso", id);
+                }
+                return await _permissionData.DeleteLogicalAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar el permiso con ID: {PermissionId}", id);
+                throw new ExternalServiceException("Base de datos", $"Error al eliminar el permiso con ID {id}", ex);
+            }
+        }
+
 
         // Método para validar el DTO
         private void ValidatePermission(PermissionDto PermissionDto)

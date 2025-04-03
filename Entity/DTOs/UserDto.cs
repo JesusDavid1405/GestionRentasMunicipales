@@ -10,9 +10,12 @@ namespace Entity.DTOs
     {
         public int UserId { get; set; }
         public string UserName { get; set; }
+        public string UserLastName { get; set; }
         public string UserEmail { get; set; }
         public string UserPassword { get; set; }
-        public int Telephone { get; set; }
-        public string Adress { get; set; }
+        public int UserIdentification { get; set; }
+        public int phone { get; set; }
+        public string UserAddress { get; set; }
+        public bool Hidden { get; set; }
     }
 }

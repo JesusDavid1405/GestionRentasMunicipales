@@ -21,6 +21,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<RolBusiness>();
 builder.Services.AddScoped<RolData>();
 
+builder.Services.AddScoped<PermissionBusiness>();
+builder.Services.AddScoped<PermissionData>();
+
+builder.Services.AddScoped<ModuleBusiness>();
+builder.Services.AddScoped<ModuleData>();
+
+builder.Services.AddScoped<UserBusiness>();
+builder.Services.AddScoped<UserData>();
+
 var OrigenesPermitidos = builder.Configuration.GetValue<String>("OrigenesPermitidos")!.Split(",");
 
 var app = builder.Build();

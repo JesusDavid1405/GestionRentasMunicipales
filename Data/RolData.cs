@@ -191,7 +191,7 @@ namespace Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al eliminar rol: {ex.Message}");
+                _logger.LogError($"Error al eliminar rol: {ex.Message}");
                 return false;
             }
         }

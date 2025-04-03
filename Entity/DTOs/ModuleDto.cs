@@ -12,7 +12,7 @@ namespace Entity.DTOs
         public string ModuleName { get; set; }
         public string ModuleDescription { get; set; }
         public int ModuleCode { get; set; }
-
+        public bool Hidden { get; set; }
 
     }
 }

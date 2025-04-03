@@ -35,7 +35,7 @@ namespace Web.Controllers
         }
 
         ///<summary>
-        ///Obtine todos los permisos del sistema
+        ///Obtine todos los Roles del sistema
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<RolDto>), 200)]
@@ -73,17 +73,17 @@ namespace Web.Controllers
             }
             catch (ValidationException ex)
             {
-                _logger.LogWarning(ex, "Validación fallida para el permiso con ID: {RolId}", id);
+                _logger.LogWarning(ex, "Validación fallida para el rol con ID: {RolId}", id);
                 return BadRequest(new { message = ex.Message });
             }
             catch (EntityNotFoundException ex)
             {
-                _logger.LogInformation(ex, "Permiso no encontrado con ID: {RolId}", id);
+                _logger.LogInformation(ex, "rol no encontrado con ID: {RolId}", id);
                 return NotFound(new { message = ex.Message });
             }
             catch (ExternalServiceException ex)
             {
-                _logger.LogError(ex, "Error al obtener permiso con ID: {RolId}", id);
+                _logger.LogError(ex, "Error al obtener roles con ID: {RolId}", id);
                 return StatusCode(500, new { message = ex.Message });
             }
         }

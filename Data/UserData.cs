@@ -9,22 +9,65 @@ namespace Data
     public class UserData
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger _logger;
+        private readonly ILogger<UserData> _logger;
 
-        public UserData(ApplicationDbContext context, ILogger logger)
+        //contructor que recibe el contexto de base de datos
+        public UserData(ApplicationDbContext context, ILogger<UserData> logger)
         {
             _context = context;
             _logger = logger;
         }
-        public async Task<IEnumerable<User>> GetAllAsync()
+
+        /// <summary>
+        /// Obtiene todos los usuarios almacenados en la base de datos.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<User>> GetAllUserAsync()
         {
-            return await _context.Set<User>().ToListAsync();
+            string query = @"
+                SELECT 
+				u.Id, 
+				u.Name, 
+				u.LastName, 
+				u.Email, 
+				u.Password, 
+				u.Identification, 
+				u.Phone, 
+				u.Address, 
+				u.IsDeleted
+                FROM [User] u
+                WHERE u.IsDeleted = 0;
+            ";
+
+            return (IEnumerable<User>)await _context.QueryAsync<User>(query);
         }
-        public async Task<User?> GetByIdAsync(int id)
+
+        /// <summary>
+        /// Obtiene un usuario por su ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<User?> GetByIdUserAsync(int id)
         {
             try
             {
-                return await _context.Set<User>().FindAsync(id);
+                string query = @"
+                    SELECT 
+                    u.Id, 
+				    u.Name, 
+				    u.LastName, 
+				    u.Email, 
+				    u.Password, 
+				    u.Identification, 
+				    u.Phone, 
+				    u.Address, 
+				    u.IsDeleted
+                    FROM [User] u
+                    WHERE u.IsDeleted = 0 AND u.Id = @Id;
+                ";
+
+                var parameters = new { Id = id };
+                return await _context.QueryFirstOrDefaultAsync<User>(query, parameters);
             }
             catch (Exception ex)
             {
@@ -32,12 +75,34 @@ namespace Data
                 throw;
             }
         }
-        public async Task<User> CreateAsync(User user)
+
+        /// <summary>
+        /// Crea un nuevo usuario en la base de datos.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<User> CreateUserAsync(User user)
         {
             try
             {
-                await _context.Set<User>().AddAsync(user);
-                await _context.SaveChangesAsync();
+                string query = @"
+                    INSERT INTO User (Name, LastName, Email, Password, Identification, Telephone, Address, IsDeleted)
+                    OUTPUT INSERTED.Id
+                    VALUES (@Name, @LastName, @Email, @Password, @Identification, @Telephone, @Address, 0);
+                ";
+                
+                var parameters = new
+                {
+                    Name = user.Name,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Password = user.Password,
+                    Identification = user.Identification,
+                    Telephone = user.Telephone,
+                    Address = user.Address
+                };
+
+                user.Id = await _context.ExecuteScalarAsync<int>(query, parameters);
                 return user;
             }
             catch (Exception ex)
@@ -47,13 +112,42 @@ namespace Data
             }
         }
 
-        public async Task<bool> UpdateAsync(User user)
+        /// <summary>
+        /// Actualiza un usuario existente en la base de datos.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<bool> UpdateUserAsync(User user)
         {
             try
             {
-                _context.Set<User>().Update(user);
-                await _context.SaveChangesAsync();
-                return true;
+                string query = @"
+                    UPDATE User
+                    SET 
+                    Name = @Name, 
+                    LastName = @LastName, 
+                    Email = @Email, 
+                    Password = @Password, 
+                    Identification = @Identification, 
+                    Telephone = @Telephone, 
+                    Address = @Address
+                    WHERE Id = @Id;
+                ";
+                
+                var parameters = new
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    Password = user.Password,
+                    Identification = user.Identification,
+                    Telephone = user.Telephone,
+                    Address = user.Address
+                };
+
+                var rowsAffected = await _context.ExecuteAsync(query, parameters);
+                return rowsAffected > 0;
             }
             catch (Exception ex)
             {
@@ -61,16 +155,45 @@ namespace Data
                 return false;
             }
         }
-        public async Task<bool> DeleteAsync(int id)
+
+        /// <summary>
+        /// Elimina un usuario de forma persistente.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> DeletePersistentUserAsync(int id)
         {
             try
             {
-                var user = await _context.Set<User>().FindAsync(id);
-                if (user == null)
-                    return false;
-                _context.Set<User>().Remove(user);
-                await _context.SaveChangesAsync();
+               string query = @"
+                    DELETE FROM User
+                    WHERE Id = @Id;
+               "
+;
+                var parameters = new { Id = id };
+
+                await _context.ExecuteAsync(query, parameters);
                 return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al eliminar el usuario: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteLogicalUserAsync(int id)
+        {
+            try
+            {
+                string query = @"
+                    UPDATE User
+                    SET IsDeleted = 1
+                    WHERE Id = @Id;
+                ";
+                var parameters = new { Id = id };
+                var rowsAffected = await _context.ExecuteAsync(query, parameters);
+                return rowsAffected > 0;
             }
             catch (Exception ex)
             {
