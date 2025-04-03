@@ -182,7 +182,7 @@ namespace Data
         {
             try
             {
-                string query = "UPDATE Rol SET Active = 1 WHERE Id = @Id;";
+                string query = "UPDATE Rol SET Active = 0 WHERE Id = @Id;";
 
                 var parameters = new { Id = id };
 

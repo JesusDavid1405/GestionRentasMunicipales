@@ -14,9 +14,9 @@ namespace Business
     class PermissionBusiness
     {
         private readonly PermissionData _permissionData;
-        private readonly ILogger _logger;
+        private readonly ILogger<PermissionBusiness> _logger;
 
-        public PermissionBusiness(PermissionData permissionData, ILogger logger)
+        public PermissionBusiness(PermissionData permissionData, ILogger<PermissionBusiness> logger)
         {
             _permissionData = permissionData;
             _logger = logger;
@@ -27,21 +27,8 @@ namespace Business
         {
             try
             {
-                var permissions = await _permissionData.GetAllAsync();
-                var permissionsDTO = new List<PermissionDto>();
-
-                foreach (var permission in permissions)
-                {
-                    permissionsDTO.Add(new PermissionDto
-                    {
-                        PermissionId = permission.Id,
-                        PermissionName = permission.Name,
-                        PermissionDescription = permission.Description
-
-                    });
-                }
-
-                return permissionsDTO;
+                var permissions = await _permissionData.GetAllPermissionAsync();
+                return MapToDTOList(permissions);
             }
             catch (Exception ex)
             {
@@ -61,19 +48,14 @@ namespace Business
 
             try
             {
-                var permission = await _permissionData.GetByIdAsync(id);
+                var permission = await _permissionData.GetByIdPermissionAsync(id);
                 if (permission == null)
                 {
                     _logger.LogInformation("No se encontró ningún permiso con ID: {PermissionId}", id);
                     throw new EntityNotFoundException("Permiso", id);
                 }
 
-                return new PermissionDto
-                {
-                    PermissionId = permission.Id,
-                    PermissionName = permission.Name,
-                    PermissionDescription = permission.Description
-                };
+                return MapToDTO(permission);
             }
             catch (Exception ex)
             {
@@ -95,7 +77,7 @@ namespace Business
                     Description = PermissionDto.PermissionDescription // Se agregó la descripción
                 };
 
-                var permissionCreado = await _permissionData.CreateAsync(permission);
+                var permissionCreado = await _permissionData.CreatePermissionAsync(permission);
 
                 return new PermissionDto
                 {
@@ -124,6 +106,36 @@ namespace Business
                 _logger.LogWarning("Se intentó crear/actualizar un permiso con Name vacío");
                 throw new Utilities.Exceptions.ValidationException("Name", "El Name del permiso es obligatorio");
             }
+        }
+
+        // Método para mapear de Rol a RolDTO
+        private PermissionDto MapToDTO(Permission permission)
+        {
+            return new PermissionDto
+            {
+                PermissionId = permission.Id,
+                PermissionName = permission.Name,
+                PermissionDescription = permission.Description,
+                Hidden = permission.IsDeleted,
+            };
+        }
+
+        // Método para mapear de RolDTO a Rol
+        private Permission MapToEntity(PermissionDto permissionDTO)
+        {
+            return new Permission
+            {
+                Id = permissionDTO.PermissionId,
+                Name = permissionDTO.PermissionName,
+                Description = permissionDTO.PermissionDescription,
+                IsDeleted = permissionDTO.Hidden,
+            };
+        }
+
+        // Método para mapear una lista de Rol a una lista de RolDTO
+        private IEnumerable<PermissionDto> MapToDTOList(IEnumerable<Permission> permissions)
+        {
+            return permissions.Select(MapToDTO).ToList();
         }
     }
 }

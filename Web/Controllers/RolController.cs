@@ -127,9 +127,15 @@ namespace Web.Controllers
         {
             try
             {
+                // Si el ID en el body es nulo o 0, lo tomamos de la URL
+                if (rolDto.RolId == 0)
+                {
+                    rolDto.RolId = id;
+                }
+
                 if (id != rolDto.RolId)
                 {
-                    return BadRequest(new { message = "El ID de la URL no concide con el ID del Rol" });
+                    return BadRequest(new { message = "El ID de la URL no coincide con el ID del Rol en el body." });
                 }
 
                 var updateRol = await _rolBusiness.UpdateRolAsync(rolDto);
@@ -152,6 +158,12 @@ namespace Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Eliminar persistente un rol
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+
         [HttpDelete]
         [ProducesResponseType(typeof(RolDto), 200)]
         [ProducesResponseType(400)]
@@ -160,7 +172,7 @@ namespace Web.Controllers
         {
             try
             {
-                var deleteRol = await _rolBusiness.DeleteRolAsync(id);
+                var deleteRol = await _rolBusiness.DeletePersistentRolAsync(id);
                 return Ok(deleteRol);
             }
             catch (ValidationException ex)
@@ -176,6 +188,34 @@ namespace Web.Controllers
             catch (ExternalServiceException ex)
             {
                 _logger.LogError(ex, "Error al eliminar Rol con ID: {RolId}", id);
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpPatch]
+        [ProducesResponseType(typeof(RolDto), 201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> DeleteLogicalRolAsync(int id)
+        {
+            try
+            {
+                var deleteLogicalRol = await _rolBusiness.DeleteLogicalRolAsync(id);
+                return Ok(deleteLogicalRol);
+            }
+            catch (ValidationException ex)
+            {
+                _logger.LogWarning(ex, "Validacion fallida al eliminar logico Rol con ID: {RolId}", id);
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (EntityNotFoundException ex)
+            {
+                _logger.LogInformation(ex, "Permiso no encontrado con ID: {RolId}", id);
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ExternalServiceException ex)
+            {
+                _logger.LogError(ex, "Error al eliminar logico Rol con ID: {RolId}", id);
                 return StatusCode(500, new { message = ex.Message });
             }
         }

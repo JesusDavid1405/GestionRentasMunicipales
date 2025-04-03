@@ -6,25 +6,53 @@ using Microsoft.Extensions.Logging;
 
 namespace Data
 {
+    /// <summary>
+    /// Repositorio encargado de la getion de la entidad Rol en la base de datos
+    /// </summary>
     public class PermissionData
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger _logger;
+        private readonly ILogger<PermissionData> _logger;
 
-        public PermissionData(ApplicationDbContext context, ILogger logger)
+        //Contructor que recibe el contexto de base de datos
+        public PermissionData(ApplicationDbContext context, ILogger<PermissionData> logger)
         {
             _context = context;
             _logger = logger;
         }
-        public async Task<IEnumerable<Permission>> GetAllAsync()
+        /// <summary>
+        /// Obtiene todos los Permission almacenados en la base de datos.
+        /// </summary>
+        /// <returns>Lista de roles</returns>
+        public async Task<IEnumerable<Permission>> GetAllPermissionAsync()
         {
-            return await _context.Set<Permission>().ToListAsync();
+            string query = @"
+                SELECT per.Id, per.Name, per.Description, per.IsDeleted
+                FROM Permission per
+                WHERE per.IsDeleted = 0;
+            ";
+
+            return (IEnumerable<Permission>)await _context.QueryAsync<Permission>(query);
         }
-        public async Task<Permission?> GetByIdAsync(int id)
+
+        /// <summary>
+        /// Obtiene todos los Permission con base a un Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<Permission?> GetByIdPermissionAsync(int id)
         {
             try
             {
-                return await _context.Set<Permission>().FindAsync(id);
+                string query = @"
+                    SELECT per.Id, per.Name, per.Description, per.IsDeleted
+                    FROM Permission per
+                    WHERE per.IsDeleted = 0 AND per.Id = @Id;
+                ";
+
+                var parameters = new { Id = id };
+
+                return await _context.QueryFirstOrDefaultAsync<Permission>(query, parameters);
             }
             catch (Exception ex)
             {
@@ -32,12 +60,30 @@ namespace Data
                 throw;
             }
         }
-        public async Task<Permission> CreateAsync(Permission permission)
+
+        /// <summary>
+        /// Crea un permission en la base de datos
+        /// </summary>
+        /// <param name="permission"></param>
+        /// <returns></returns>
+        public async Task<Permission> CreatePermissionAsync(Permission permission)
         {
             try
             {
-                await _context.Set<Permission>().AddAsync(permission);
-                await _context.SaveChangesAsync();
+                string query = @"
+                    INSERT INTO Permission (Name,Description,IsDeleted)
+                    OUTPUT INSERTED.Id
+                    VALUES (@Name, @Description, @IsDelete);
+                ";
+
+                var parameters = new
+                {
+                    Name = permission.Name,
+                    Description = permission.Description,
+                    IsDeleted = permission.IsDeleted,
+                };
+
+                permission.Id = await _context.ExecuteScalarAsync<int>(query, parameters);
                 return permission;
             }
             catch (Exception ex)
@@ -46,13 +92,30 @@ namespace Data
                 throw;
             }
         }
-        public async Task<bool> UpdateAsync(Permission permission)
+
+        public async Task<bool> UpdatePermissionAsync(Permission permission)
         {
             try
             {
-                _context.Set<Permission>().Update(permission);
-                await _context.SaveChangesAsync();
-                return true;
+                string query = @"
+                    UPDATE [Permission]
+                    SET 
+                    Name = @Name, 
+                    Description = @Description, 
+                    IsDeleted = @IsDeleted
+                    WHERE Id = @Id;
+                ";
+                
+                var parameters = new
+                {
+                    Id = permission.Id,
+                    Name = permission.Name,
+                    Description = permission.Description,
+                    IsDeleted = permission.IsDeleted
+                };
+
+                int rowsAffected = await _context.ExecuteAsync(query, parameters);
+                return rowsAffected > 0;
             }
             catch (Exception ex)
             {
@@ -60,21 +123,53 @@ namespace Data
                 return false;
             }
         }
-        public async Task<bool> DeleteAsync(int id)
+
+        /// <summary>
+        /// Elimina permamentemente un permission de la base de datos
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> DeletePersistenteAsync(int id)
         {
             try
             {
-                var permission = await _context.Set<Permission>().FindAsync(id);
-                if (permission == null)
-                    return false;
+                string query = @"
+                    DELETE FROM Permission
+                    WHERE Id = @Id;
+|               ";
+                var parameters = new { Id = id };
 
-                _context.Set<Permission>().Remove(permission);
-                await _context.SaveChangesAsync();
+                await _context.ExecuteAsync(query, parameters);
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al eliminar el permiso: {ex.Message}");
+                _logger.LogError($"Eror al eliminar el Permission: {id}", ex);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Elimina un permission de forma logica
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteLogicalAsync(int id)
+        {
+            try
+            {
+                string query = @"
+                    UPDATE Permission
+                    SET IsDeleted = 1
+                    WHERE Id = @Id;
+                ";
+                var parameters = new { Id = id };
+                await _context.ExecuteAsync(query, parameters);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error al eliminar el Permission: {id}", ex);
                 return false;
             }
         }

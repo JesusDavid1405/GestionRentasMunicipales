@@ -84,6 +84,14 @@ namespace Business
             }
         }
 
+        /// <summary>
+        /// Actualizar un rol
+        /// </summary>
+        /// <param name="rolDto"></param>
+        /// <returns></returns>
+        /// <exception cref="EntityNotFoundException"></exception>
+        /// <exception cref="ExternalServiceException"></exception>
+
         public async Task<bool> UpdateRolAsync(RolDto rolDto)
         {
             try
@@ -115,18 +123,87 @@ namespace Business
         /// <param name="RolDto"></param>
         /// <exception cref="Utilities.Exceptions.ValidationException"></exception>
 
-        //public async Task<bool> DeletePersistentAsyncRolSql(int id)
-        //{
-        //    try
-        //    {
-        //        if()
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error al eliminar el rol con ID: {RolId}", id);
-        //        throw new ExternalServiceException("Base de datos", "Error al eliminar el rol", ex);
-        //    }
-        //}
+        public async Task<bool> DeletePersistentRolAsync(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    _logger.LogWarning("Se intentó eliminar un rol con ID inválido: {RolId}", id);
+                    throw new Utilities.Exceptions.ValidationException("id", "El ID del rol debe ser mayor que cero");
+                }
+
+                var rol = await _rolData.GetByIdRolAsyncSql(id);
+                if (rol == null)
+                {
+                    _logger.LogInformation("No se encontró ningún rol con ID: {RolId}", id);
+                    throw new EntityNotFoundException("Rol", id);
+                }
+
+                var result = await _rolData.DeleteRolPersistentAsyncSql(id);
+
+                if (result)
+                {
+                    _logger.LogInformation("Rol eliminado exitosamente con ID: {RolId}", id);
+                }
+                else
+                {
+                    _logger.LogWarning("No se pudo eliminar el rol con ID: {RolId}", id);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar el rol con ID: {RolId}", id);
+                throw new ExternalServiceException("Base de datos", "Error al eliminar el rol", ex);
+            }
+        }
+
+        /// <summary>
+        /// Elminar logico de un rol de la base de datos
+        /// </summary>
+        /// <param name="RolDto"></param>
+        /// <exception cref="Utilities.Exceptions.ValidationException"></exception>
+        
+        public async Task<bool> DeleteLogicalRolAsync(int id)
+        {
+            try
+            {
+                if(id <= 0)
+                {
+                    _logger.LogWarning("Se intentó eliminar logicamente un rol con ID invalido: {RolId}", id);
+                    throw new Utilities.Exceptions.ValidationException("id", "El ID del rol debe ser mayor que cero");
+                }
+
+                var rol = await _rolData.GetByIdRolAsyncSql(id);
+
+                if(rol == null)
+                {
+                    _logger.LogInformation("No se encontró ningún rol con ID: {RolId}", id);
+                    throw new EntityNotFoundException("Rol", id);
+                }
+
+                var result = await _rolData.DeleteRolLogicalAsyncSql(id);
+
+                if (result)
+                {
+                    _logger.LogInformation("Rol eliminado logicamente exitosamenrte con ID: {RolId}", id);
+                }
+                else
+                {
+                    _logger.LogWarning("No se pudo eliminar de forma logica el rol con ID: {RolId}", id);
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar el rol con ID: {RolId}", id);
+                throw new ExternalServiceException("Base de datos", "Error al eliminar el rol", ex);
+            }
+        }
+
 
         // Método para validar el DTO
         private void ValidateRol(RolDto RolDto)
