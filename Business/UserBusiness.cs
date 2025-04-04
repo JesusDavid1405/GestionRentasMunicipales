@@ -118,7 +118,7 @@ namespace Business
                 existingUser.Email = userDto.UserEmail;
                 existingUser.Password = userDto.UserPassword;
                 existingUser.Identification = userDto.UserIdentification;
-                existingUser.Telephone = userDto.phone;
+                existingUser.Phone = userDto.Telephone;
                 existingUser.Address = userDto.UserAddress;
                 existingUser.IsDeleted = userDto.Hidden;
 
@@ -224,7 +224,7 @@ namespace Business
                 UserEmail = user.Email,
                 UserPassword = user.Password,
                 UserIdentification = user.Identification,
-                phone = user.Telephone,
+                Telephone = user.Phone,
                 Hidden = user.IsDeleted,
             };
         }
@@ -240,7 +240,7 @@ namespace Business
                 Email = userDto.UserEmail,
                 Password = userDto.UserPassword,
                 Identification = userDto.UserIdentification,
-                Telephone = userDto.phone,
+                Phone = userDto.Telephone,
                 Address = userDto.UserAddress,
                 IsDeleted = userDto.Hidden,
             };

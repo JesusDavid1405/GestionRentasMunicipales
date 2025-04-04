@@ -13,14 +13,14 @@ namespace Data
     public class FormData
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger _logger;
+        private readonly ILogger<FormData> _logger;
 
         /// <summary>
         /// Constructor que recibe recibe el contexto de base de datos.
         /// </summary>
         /// <param name="context">Intancia de <see cref="ApplicationDbContext"/> para la conexión con la base de datos.</param>
 
-        public FormData(ApplicationDbContext context, ILogger logger)
+        public FormData(ApplicationDbContext context, ILogger<FormData> logger)
         {
             _context = context;
             _logger = logger;
@@ -30,19 +30,34 @@ namespace Data
         /// Obtiene todos los formularios almacenados en la base de datos.
         /// </summary>
         /// <returns>Lista de formularios</returns>
-        public async Task<IEnumerable<Form>> GetAllAsync()
+        public async Task<IEnumerable<Form>> GetAllFormAsync()
         {
-            return await _context.Set<Form>().ToListAsync();
+            string query = @"
+                SELECT f.Id, f.Name, f.Description, f.IsDeleted
+                FROM Form f
+                WHERE f.IsDeleted = 0;
+            ";
+
+            return (IEnumerable<Form>)await _context.QueryAsync<Form>(query);
+            
         }
 
         /// <summary>
         /// Obtiene un formulario especifico por su identificador
         /// </summary>
-        public async Task<Form?> GetByIdAsync(int id)
+        public async Task<Form?> GetByIdFormAsync(int id)
         {
             try
             {
-                return await _context.Set<Form>().FindAsync(id);
+                string query = @"
+                    SELECT f.Id, f.Name, f.Description, f.IsDeleted
+                    FROM Form f
+                    WHERE f.IsDeleted = 0 AND f.Id = @Id;
+                ";
+
+                var parameters = new { Id = id };
+
+                return await _context.QueryFirstOrDefaultAsync<Form>(query, parameters);
             }
             catch (Exception ex)
             {
@@ -50,18 +65,30 @@ namespace Data
                 throw; //Re-lanza la excepcion para sea manejada en capas superiores
             }
         }
+
         /// <summary>
         /// Crea un nuevo formulario en la base de datos
         /// </summary>
         /// <param name="form"></param>
         /// <returns>el formulario creado.</returns>
         /// 
-        public async Task<Form> CreateAsync(Form form)
+        public async Task<Form> CreateFormAsync(Form form)
         {
             try
             {
-                await _context.Set<Form>().AddAsync(form);
-                await _context.SaveChangesAsync();
+                string query = @"
+                    INSERT INTO Form (Name,Description,IsDeleted)
+                    OUTPUT INSERTED.Id
+                    VALUES (@Name, @Description, 0);
+                ";
+
+                var parameters = new
+                {
+                    Name = form.Name,
+                    Description = form.Description,
+                };
+
+                form.Id = await _context.ExecuteScalarAsync<int>(query, parameters);
                 return form;
             }
             catch (Exception ex)
@@ -70,18 +97,34 @@ namespace Data
                 throw;
             }
         }
+
         /// <summary>
         /// Actualiza un formulario existente en la base de datos
         /// </summary>
         /// <param name="form">Objeto con la informacion actualizada</param>
         /// <returns>True si la operacion fue exitosa, False en caso contrario</returns>
-        public async Task<bool> UpdateAsync(Form form)
+        public async Task<bool> UpdateFormAsync(Form form)
         {
             try
             {
-                _context.Set<Form>().Update(form);
-                await _context.SaveChagesAsync();
+                string query = @"
+                    UPDATE [Form]
+                    SET 
+                    Name = @Name, 
+                    Description = @Description
+                    WHERE Id = @Id;
+                ";
+
+                var parameters = new
+                {
+                    Id = form.Id,
+                    Name = form.Name,
+                    Description = form.Description
+                };
+
+                int rowsAffected = await _context.ExecuteAsync(query, parameters);
                 return true;
+
             }
             catch (Exception ex)
             {
@@ -90,20 +133,53 @@ namespace Data
             }
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        /// <summary>
+        /// Eliminando un Form de forma Persistente
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> DeletePersistentFormAsync(int id)
         {
             try
             {
-                var form = await _context.Set<Form>().FindAsync(id);
-                if (form == null)
-                    return false;
-                _context.Set<Form>().Remove(form);
-                await _context.SaveChangesAsync();
+                string query = @"
+                    DELETE FROM Form
+                    WHERE Id = @Id;
+                ";
+
+                var parameters = new { Id = id };
+
+                await _context.ExecuteAsync(query, parameters);
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al eliminar formulario: {ex.Message}");
+                _logger.LogError($"Error al eliminar formulario: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Eliminando un Form de forma logica
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteLogicalFormAsync(int id)
+        {
+            try
+            {
+                string query = @"
+                    UPDATE Form
+                    SET IsDeleted = 1
+                    WHERE Id = @Id;
+                ";
+                var parameters = new { Id = id };
+                await _context.ExecuteAsync(query, parameters);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error al eliminar el Form: {id}", ex);
                 return false;
             }
         }

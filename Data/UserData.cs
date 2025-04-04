@@ -86,9 +86,9 @@ namespace Data
             try
             {
                 string query = @"
-                    INSERT INTO User (Name, LastName, Email, Password, Identification, Telephone, Address, IsDeleted)
+                    INSERT INTO User (Name, LastName, Email, Password, Identification, Phone, Address, IsDeleted)
                     OUTPUT INSERTED.Id
-                    VALUES (@Name, @LastName, @Email, @Password, @Identification, @Telephone, @Address, 0);
+                    VALUES (@Name, @LastName, @Email, @Password, @Identification, @Phone, @Address, 0);
                 ";
                 
                 var parameters = new
@@ -98,7 +98,7 @@ namespace Data
                     Email = user.Email,
                     Password = user.Password,
                     Identification = user.Identification,
-                    Telephone = user.Telephone,
+                    Phone = user.Phone,
                     Address = user.Address
                 };
 
@@ -129,7 +129,7 @@ namespace Data
                     Email = @Email, 
                     Password = @Password, 
                     Identification = @Identification, 
-                    Telephone = @Telephone, 
+                    Phone = @Phone, 
                     Address = @Address
                     WHERE Id = @Id;
                 ";
@@ -142,7 +142,7 @@ namespace Data
                     Email = user.Email,
                     Password = user.Password,
                     Identification = user.Identification,
-                    Telephone = user.Telephone,
+                    Phone = user.Phone,
                     Address = user.Address
                 };
 

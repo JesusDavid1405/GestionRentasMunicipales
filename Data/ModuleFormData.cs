@@ -13,23 +13,59 @@ namespace Data
     public class ModuleFormData
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger _logger;
+        private readonly ILogger<ModuleFormData> _logger;
 
-        public ModuleFormData(ApplicationDbContext context, ILogger logger)
+        public ModuleFormData(ApplicationDbContext context, ILogger<ModuleFormData> logger)
         {
             _context = context;
             _logger = logger;
         }
 
-        public async Task<IEnumerable<ModuleForm>> GetAllAsync()
+        /// <summary>
+        /// Obtener todo los Module Form existentes
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<ModuleForm>> GetAllModuleFormAsync()
         {
-            return await _context.Set<ModuleForm>().ToListAsync();
+            string query = @"
+                SELECT
+                mf.Id,
+                mf.FormId,
+                f.Name as FormName,
+                mf.ModuleId,
+                m.Name as ModuleName
+                FROM ModuleForm mf
+                INNER JOIN Form f ON mf.FormId = f.Id
+                INNER JOIN Module m ON mf.ModuleId = m.Id
+            ";
+
+            return await _context.QueryAsync<ModuleForm>(query);
         }
-        public async Task<ModuleForm?> GetByIdAsync(int id)
+
+        /// <summary>
+        /// Obtener los ModuleForm que existan con un Id en expecificos
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ModuleForm?> GetByIdModuleFormAsync(int id)
         {
             try
             {
-                return await _context.Set<ModuleForm>().FindAsync(id);
+                string query = @"
+                    SELECT
+                    mf.Id,
+                    mf.FormId,
+                    f.Name as FormName,
+                    mf.ModuleId,
+                    m.Name as ModuleName
+                    FROM ModuleForm mf
+                    INNER JOIN Form f ON mf.FormId = f.Id
+                    INNER JOIN Module m ON mf.ModuleId = m.Id
+                 	WHERE mf.Id = 1;
+                ";
+
+                var parameters = new { Id = id };
+                return await _context.QueryFirstOrDefaultAsync<ModuleForm>(query,parameters);
             }
             catch (Exception ex)
             {
@@ -37,12 +73,29 @@ namespace Data
                 throw;
             }
         }
-        public async Task<ModuleForm> CreateAsync(ModuleForm moduleForm)
+
+        /// <summary>
+        /// Crear un ModuleForm
+        /// </summary>
+        /// <param name="moduleForm"></param>
+        /// <returns></returns>
+        public async Task<ModuleForm> CreateModuleFormAsync(ModuleForm moduleForm)
         {
             try
             {
-                await _context.Set<ModuleForm>().AddAsync(moduleForm);
-                await _context.SaveChangesAsync();
+                string query = @"
+                    INSERT INTO ModuleForm (FormId, ModuleId)
+                    OUTPUT INSERTED.Id
+                    VALUES (@FormId, @ModuleId);
+                ";
+
+                var parameters = new
+                {
+                    FormId = moduleForm.FormId,
+                    ModuleId = moduleForm.ModuleId,
+                };
+
+                moduleForm.Id = await _context.ExecuteScalarAsync<int>(query, parameters);
                 return moduleForm;
             }
             catch (Exception ex)
@@ -51,13 +104,33 @@ namespace Data
                 throw;
             }
         }
-        public async Task<bool> UpdateAsync(ModuleForm moduleForm)
+
+        /// <summary>
+        /// Actualizar un ModuleForm
+        /// </summary>
+        /// <param name="moduleForm"></param>
+        /// <returns></returns>
+        public async Task<bool> UpdateModuleFormAsync(ModuleForm moduleForm)
         {
             try
             {
-                _context.Set<ModuleForm>().Update(moduleForm);
-                await _context.SaveChagesAsync();
-                return true;
+                string query = @"
+                    UPDATE ModuleForm
+                    SET
+                    FormId = @FormId,
+                    ModuleId = @ModuleId
+                    WHERE Id = @Id;
+                ";
+
+                var parameters = new
+                {
+                    Id = moduleForm.Id,
+                    FormId = moduleForm.FormId,
+                    ModuleId = moduleForm.ModuleId,
+                };
+
+                int rowsAffected = await _context.ExecuteAsync(query, parameters);
+                return rowsAffected > 0;
             }
             catch (Exception ex)
             {
@@ -65,21 +138,29 @@ namespace Data
                 return false;
             }
         }
-        public async Task<bool> DeleteAsync(int id)
+
+        /// <summary>
+        /// Elimando un ModuleForm de forma Persistente
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteModuleFormAsync(int id)
         {
             try
             {
-                var moduleForm = await _context.Set<ModuleForm>().FindAsync(id);
-                if (moduleForm == null)
-                    return false;
+                string query = @"
+                    DELETE FROM ModuleForm
+                    WHERE Id = @Id;
+                ";
 
-                _context.Set<ModuleForm>().Remove(moduleForm);
-                await _context.SaveChangesAsync();
-                return false;
+                var parameters = new { Id = id };
+
+                await _context.ExecuteAsync(query, parameters);
+                return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error al eliminar el modulo con sus permisos {ex.Message}");
+                _logger.LogError($"Error al eliminar el modulo con sus permisos {ex.Message}");
                 return false;
             }
         }

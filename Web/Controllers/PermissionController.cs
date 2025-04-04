@@ -157,7 +157,7 @@ namespace Web.Controllers
         }
 
         [HttpDelete]
-        [ProducesResponseType(typeof(RolDto), 200)]
+        [ProducesResponseType(typeof(PermissionDto), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> DeleteRolAsync(int id)
@@ -185,7 +185,7 @@ namespace Web.Controllers
         }
 
         [HttpPatch]
-        [ProducesResponseType(typeof(RolDto), 201)]
+        [ProducesResponseType(typeof(PermissionDto), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> DeleteLogicalRolAsync(int id)
