@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer("name=DefaultConn")
+    options.UseSqlServer("name=DefaultConnection")
 );
 
 
@@ -35,6 +35,9 @@ builder.Services.AddScoped<FormData>();
 
 builder.Services.AddScoped<ModuleFormBusiness>();
 builder.Services.AddScoped<ModuleFormData>();
+
+builder.Services.AddScoped<RolUserBusiness>();
+builder.Services.AddScoped<RolUserData>();
 
 var OrigenesPermitidos = builder.Configuration.GetValue<String>("OrigenesPermitidos")!.Split(",");
 

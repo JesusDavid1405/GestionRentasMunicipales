@@ -8,12 +8,12 @@ namespace Entity.Model
 {
     public class RolUser
     {
-        public int RolUserId { get; set; }
+        public int Id { get; set; }
         public int RolId { get; set; }
         public int UserId { get; set; }
 
-        public Rol Rol { get; set; }
-        public User User { get; set; }
+        public virtual Rol Rol { get; set; }
+        public virtual User User { get; set; }
 
     }
 }

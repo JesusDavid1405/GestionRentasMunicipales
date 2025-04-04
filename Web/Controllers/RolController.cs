@@ -39,6 +39,7 @@ namespace Web.Controllers
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<RolDto>), 200)]
+        [ProducesResponseType(400)]
         [ProducesResponseType(500)]
 
         public async Task<IActionResult> GetAllRols()

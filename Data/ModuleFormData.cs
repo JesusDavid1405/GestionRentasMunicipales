@@ -36,7 +36,7 @@ namespace Data
                 m.Name as ModuleName
                 FROM ModuleForm mf
                 INNER JOIN Form f ON mf.FormId = f.Id
-                INNER JOIN Module m ON mf.ModuleId = m.Id
+                INNER JOIN Module m ON mf.ModuleId = m.Id;
             ";
 
             return await _context.QueryAsync<ModuleForm>(query);
@@ -61,7 +61,7 @@ namespace Data
                     FROM ModuleForm mf
                     INNER JOIN Form f ON mf.FormId = f.Id
                     INNER JOIN Module m ON mf.ModuleId = m.Id
-                 	WHERE mf.Id = 1;
+                 	WHERE mf.Id = @Id;
                 ";
 
                 var parameters = new { Id = id };

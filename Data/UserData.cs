@@ -86,7 +86,7 @@ namespace Data
             try
             {
                 string query = @"
-                    INSERT INTO User (Name, LastName, Email, Password, Identification, Phone, Address, IsDeleted)
+                    INSERT INTO [User] (Name, LastName, Email, Password, Identification, Phone, Address, IsDeleted)
                     OUTPUT INSERTED.Id
                     VALUES (@Name, @LastName, @Email, @Password, @Identification, @Phone, @Address, 0);
                 ";
@@ -122,7 +122,7 @@ namespace Data
             try
             {
                 string query = @"
-                    UPDATE User
+                    UPDATE [User]
                     SET 
                     Name = @Name, 
                     LastName = @LastName, 
@@ -166,7 +166,7 @@ namespace Data
             try
             {
                string query = @"
-                    DELETE FROM User
+                    DELETE FROM [User]
                     WHERE Id = @Id;
                "
 ;
@@ -187,7 +187,7 @@ namespace Data
             try
             {
                 string query = @"
-                    UPDATE User
+                    UPDATE [User]
                     SET IsDeleted = 1
                     WHERE Id = @Id;
                 ";

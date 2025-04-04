@@ -110,7 +110,8 @@ namespace Business
         {
             try
             {
-                ValidatePermission(PermissionDto);   
+                ValidatePermission(PermissionDto);  
+                
                 
                 var existigPermission = await _permissionData.GetByIdPermissionAsync(PermissionDto.PermissionId);
                 if (existigPermission == null)

@@ -160,7 +160,7 @@ namespace Web.Controllers
         [ProducesResponseType(typeof(PermissionDto), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteRolAsync(int id)
+        public async Task<IActionResult> DeletePermission(int id)
         {
             try
             {

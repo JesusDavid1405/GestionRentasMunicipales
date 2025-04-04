@@ -13,22 +13,60 @@ namespace Data
     public class RolUserData
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger _logger;
+        private readonly ILogger<RolUserData> _logger;
 
-        public RolUserData(ApplicationDbContext context, ILogger logger)
+        public RolUserData(ApplicationDbContext context, ILogger<RolUserData> logger)
         {
             _context = context;
             _logger = logger;
         }
-        public async Task<IEnumerable<RolUser>> GetAllAsync()
+
+        /// <summary>
+        /// Obtener todo los RolUser existentes 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<RolUser>> GetAllRolUserAsync()
         {
-            return await _context.Set<RolUser>().ToListAsync();
+            string query = @"
+                SELECT
+                ru.Id,
+                ru.RolId,
+                r.Name AS RolName,
+                ru.UserId,
+                u.Name AS UserName,
+                u.LastName AS LastName
+                FROM RolUser ru
+                INNER JOIN [User] u ON ru.UserId = u.Id
+                INNER JOIN Rol r ON ru.RolId = r.Id;
+            ";
+
+            return await _context.QueryAsync<RolUser>(query);
         }
-        public async Task<RolUser?> GetByIdAsync(int id)
+
+        /// <summary>
+        /// Obtener un RolUser que contenga un Id expecifico
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<RolUser?> GetByIdRolUserAsync(int id)
         {
             try
             {
-                return await _context.Set<RolUser>().FindAsync(id);
+                string query = @"
+                    SELECT
+                    ru.Id,
+                    ru.RolId,
+                    r.Name AS RolName,
+                    ru.UserId,
+                    u.Name AS UserName,
+                    u.LastName AS LastName
+                    FROM RolUser ru
+                    INNER JOIN [User] u ON ru.UserId = u.Id
+                    INNER JOIN Rol r ON ru.RolId = r.Id;
+                ";
+
+                var parameters = new { Id = id };
+                return await _context.QueryFirstOrDefaultAsync<RolUser>(query,parameters);
             }
             catch (Exception ex)
             {
@@ -36,12 +74,29 @@ namespace Data
                 throw;
             }
         }
-        public async Task<RolUser> CreateAsync(RolUser rolUser)
+
+        /// <summary>
+        /// Crear un RolUser
+        /// </summary>
+        /// <param name="rolUser"></param>
+        /// <returns></returns>
+        public async Task<RolUser> CreateRolUserAsync(RolUser rolUser)
         {
             try
             {
-                await _context.Set<RolUser>().AddAsync(rolUser);
-                await _context.SaveChangesAsync();
+                string query = @"
+                    INSERT INTO RolUser (RolId, UserId)
+                    OUTPUT  INSERTED.Id
+                    VALUES (@RolId, @UserId);
+                ";
+
+                var parameters = new
+                {
+                    RolId = rolUser.RolId,
+                    UserId = rolUser.UserId
+                };
+
+                rolUser.Id = await _context.ExecuteScalarAsync<int>(query, parameters);
                 return rolUser;
             }
             catch (Exception ex)
@@ -51,13 +106,27 @@ namespace Data
             }
         }
 
-        public async Task<bool> UpdateAsync(RolUser rolUser)
+        public async Task<bool> UpdateRolUserAsync(RolUser rolUser)
         {
             try
             {
-                _context.Set<RolUser>().Update(rolUser);
-                await _context.SaveChangesAsync();
-                return true;
+                string query = @"
+                    UPDATE rolUser
+                    SET
+                    RolId = @RolId,
+                    UserId = @UserId
+                    WHERE Id = @Id;
+                ";
+
+                var parameters = new
+                {
+                    Id = rolUser.Id,
+                    RolId = rolUser.RolId,
+                    UserId = rolUser.UserId
+                };
+
+                int rowsAffected = await _context.ExecuteAsync(query, parameters);
+                return rowsAffected > 0;
             }
             catch (Exception ex)
             {
@@ -65,15 +134,18 @@ namespace Data
                 return false;
             }
         }
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteRolUserAsync(int id)
         {
             try
             {
-                var rolUser = await _context.Set<RolUser>().FindAsync(id);
-                if (rolUser == null)
-                    return false;
-                _context.Set<RolUser>().Remove(rolUser);
-                await _context.SaveChangesAsync();
+                string query = @"
+                    DELETE FROM RolUser
+                    WHERE Id = @Id;
+                ";
+
+                var parameters = new { Id = id };
+
+                await _context.ExecuteAsync(query, parameters);
                 return true;
             }
             catch (Exception ex)

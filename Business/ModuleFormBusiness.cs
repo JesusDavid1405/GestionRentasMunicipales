@@ -111,14 +111,16 @@ namespace Business
             {
                 ValidateModuleForm(moduleFormDto);
 
-                var existigModuleForm = await _moduleFormData.GetByIdModuleFormAsync(moduleFormDto.ModuleFormId);
+                var moduleForm = MapToEntity(moduleFormDto);
+
+                var existigModuleForm = await _moduleFormData.GetByIdModuleFormAsync(moduleForm.Id);
                 if (existigModuleForm == null)
                 {
-                    throw new EntityNotFoundException("ModuleForm", moduleFormDto.ModuleFormId);
+                    throw new EntityNotFoundException("ModuleForm", moduleForm.Id);
                 }
 
-                existigModuleForm.FormId = moduleFormDto.FormId;
-                existigModuleForm.ModuleId = moduleFormDto.ModuleId;
+                existigModuleForm.FormId = moduleForm.FormId;
+                existigModuleForm.ModuleId = moduleForm.ModuleId;
 
                 return await _moduleFormData.UpdateModuleFormAsync(existigModuleForm);
             }
