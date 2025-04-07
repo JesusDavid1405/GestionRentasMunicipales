@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Reflection;
 
-namespace Entity.Contexts
+namespace Data.Contexts
 {
     /// <summary>
     /// Representa el contexto de la base de datos de la aplicación, proporcionando configuraciones y métodos

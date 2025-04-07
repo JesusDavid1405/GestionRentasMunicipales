@@ -1,4 +1,6 @@
-﻿using Data;
+﻿using Business.Interfaces;
+using Data;
+using Data.Repository;
 using Entity.DTOs;
 using Entity.Model;
 using Microsoft.Extensions.Logging;
@@ -6,12 +8,12 @@ using Microsoft.SqlServer.Server;
 using System.ComponentModel.DataAnnotations;
 using Utilities.Exceptions;
 
-namespace Business
+namespace Business.Services
 {
     /// <summary>
     /// Clase de negocio encargada de la lógica relacionada con los roles del sistema.
     /// </summary>
-    public class RolBusiness
+    public class RolBusiness : IRolBusiness
     {
         private readonly RolData _rolData;
         private readonly ILogger<RolBusiness> _logger;

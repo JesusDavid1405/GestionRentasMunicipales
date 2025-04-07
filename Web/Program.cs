@@ -1,7 +1,10 @@
 using Business;
+using Business.Services;
+using Business.Interfaces;
 using Data;
-using Entity.Contexts;
+using Data.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Data.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 

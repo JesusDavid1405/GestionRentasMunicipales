@@ -5,19 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
-using Entity.Contexts;
+using Data.Contexts;
+using Data.Interfaces;
 using Entity.Model;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 
-namespace Data
+namespace Data.Repository
 {
     /// <summary>
     /// Repositorio encargado de la getion de la entidad Rol en la base de datos
     /// </summary>
-    public class RolData
+    public class RolData : IRolData
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<RolData> _logger;
